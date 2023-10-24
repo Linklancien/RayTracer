@@ -3,11 +3,11 @@ module main
 // implementer les nouveaux déplacements
 
 
-import sokol.sgl
+//import sokol.sgl
 import gg
 import gx
-import rand as rd
-import math.bits
+//import rand as rd
+//import math.bits
 import math
 
 
@@ -67,8 +67,18 @@ fn (mut cam Cam) init (){
 		y : cam.view.v.y/win_height
 		z :	cam.view.v.z/win_height
 	}
+	cam.view.upper_left = Point{
+		x : cam.pos.x - cam.view.u.x - cam.view.v.x
+		y : cam.pos.y - cam.view.u.y - cam.view.v.y
+		z :	cam.pos.z - cam.view.u.z - cam.view.v.z- cam.focal
+	}
+	cam.view.pixel00_loc = Point{
+		x : cam.view.upper_left.x + 0.5*(cam.view.px_delta_u.x + cam.view.px_delta_v.x)
+		y : cam.view.upper_left.y + 0.5*(cam.view.px_delta_u.y + cam.view.px_delta_v.y)
+		z :	cam.view.upper_left.z + 0.5*(cam.view.px_delta_u.z + cam.view.px_delta_v.z)
+	}
 }
-//Viewport
+//Viewporv.t
 struct Viewport{
 	mut:
 		width  f64
@@ -77,6 +87,8 @@ struct Viewport{
 		v Vector
 		px_delta_u Vector
 		px_delta_v Vector
+		upper_left Point
+		pixel00_loc Point
 }
 
 //Vecteurs
@@ -94,7 +106,6 @@ fn (vec Vector) normalize() Vector{
 		z : vec.z/len
     }
 }
-//Point
 struct Point {
 	x f64
 	y f64
@@ -108,6 +119,10 @@ fn vec_from_pts(pt1 Point, pt2 Point) Vector{
 		z : pt2.z - pt1.z
 	}
 }
+fn (pt1 Point) - (pt2 Point) Vector{
+	return Vector{pt1.x - pt2.x, pt1.y - pt2.y, pt1.z - pt2.z}
+}
+//Poi
 
 //Rays
 struct Ray{
@@ -156,16 +171,31 @@ fn on_frame(mut app App) {
 }
 
 fn (mut app App) calcul() {
+	print("0/${win_height} lines remaining ")
 	for y, mut ligne in app.screen_pixels{
 		for x, mut valeur in ligne{
-			valeur = color_pixel(x, y)
+			pixel_center := Point{
+				x : app.cam.view.pixel00_loc.x + x*app.cam.view.px_delta_u.x +  y*app.cam.view.px_delta_v.x
+				y : app.cam.view.pixel00_loc.y + x*app.cam.view.px_delta_u.y +  y*app.cam.view.px_delta_v.y
+				z : app.cam.view.pixel00_loc.z + x*app.cam.view.px_delta_u.z +  y*app.cam.view.px_delta_v.z
+			}
+			ray_direc := pixel_center - app.cam.pos
+
+			ray := Ray{pixel_center, ray_direc}
+			valeur = color_pixel(ray)
 		}
+		print("\r${y+1}/${win_height} lines remaining")
 	}
-		
 }
 
-fn color_pixel(x f64, y f64)u32{
-	return val_to_color(u8(x), u8(y), 0, 255)
+fn color_pixel(ray Ray)u32{
+	vect := ray.direction.normalize()
+	a := 0.5*(vect.y+1)
+
+	r := u8((1.0-a)*255 + a*122)
+	g := u8((1.0-a)*255 + a*200)
+	b := u8((1.0-a)*255 + a*255)
+	return val_to_color(r, g, b, 255)
 }
 
 
