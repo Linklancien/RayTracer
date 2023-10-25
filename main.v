@@ -68,15 +68,17 @@ fn (mut cam Cam) init (){
 		z :	cam.view.v.z/win_height
 	}
 	cam.view.upper_left = Point{
-		x : cam.pos.x - cam.view.u.x - cam.view.v.x
-		y : cam.pos.y - cam.view.u.y - cam.view.v.y
-		z :	cam.pos.z - cam.view.u.z - cam.view.v.z- cam.focal
+		x : cam.pos.x - (cam.view.u.x/2) - (cam.view.v.x/2)
+		y : cam.pos.y - (cam.view.u.y/2) - (cam.view.v.y/2)
+		z :	cam.pos.z - (cam.view.u.z/2) - (cam.view.v.z/2) - cam.focal
 	}
+	print(cam.view.upper_left)
 	cam.view.pixel00_loc = Point{
 		x : cam.view.upper_left.x + 0.5*(cam.view.px_delta_u.x + cam.view.px_delta_v.x)
 		y : cam.view.upper_left.y + 0.5*(cam.view.px_delta_u.y + cam.view.px_delta_v.y)
 		z :	cam.view.upper_left.z + 0.5*(cam.view.px_delta_u.z + cam.view.px_delta_v.z)
 	}
+	print(cam.view.pixel00_loc)
 }
 //Viewporv.t
 struct Viewport{
@@ -112,13 +114,6 @@ struct Point {
 	z f64
 }
 //FONCTIONS POUR LES VECTEURS
-fn vec_from_pts(pt1 Point, pt2 Point) Vector{
-	return Vector{
-        x : pt2.x - pt1.x
-		y : pt2.y - pt1.y 
-		z : pt2.z - pt1.z
-	}
-}
 fn (pt1 Point) - (pt2 Point) Vector{
 	return Vector{pt1.x - pt2.x, pt1.y - pt2.y, pt1.z - pt2.z}
 }
@@ -175,13 +170,13 @@ fn (mut app App) calcul() {
 	for y, mut ligne in app.screen_pixels{
 		for x, mut valeur in ligne{
 			pixel_center := Point{
-				x : app.cam.view.pixel00_loc.x + x*app.cam.view.px_delta_u.x +  y*app.cam.view.px_delta_v.x
-				y : app.cam.view.pixel00_loc.y + x*app.cam.view.px_delta_u.y +  y*app.cam.view.px_delta_v.y
-				z : app.cam.view.pixel00_loc.z + x*app.cam.view.px_delta_u.z +  y*app.cam.view.px_delta_v.z
+				x : app.cam.view.pixel00_loc.x + y*app.cam.view.px_delta_u.x +  x*app.cam.view.px_delta_v.x
+				y : app.cam.view.pixel00_loc.y + y*app.cam.view.px_delta_u.y +  x*app.cam.view.px_delta_v.y
+				z : app.cam.view.pixel00_loc.z + y*app.cam.view.px_delta_u.z +  x*app.cam.view.px_delta_v.z
 			}
 			ray_direc := pixel_center - app.cam.pos
-
 			ray := Ray{pixel_center, ray_direc}
+			
 			valeur = color_pixel(ray)
 		}
 		print("\r${y+1}/${win_height} lines remaining")
@@ -192,9 +187,9 @@ fn color_pixel(ray Ray)u32{
 	vect := ray.direction.normalize()
 	a := 0.5*(vect.y+1)
 
-	r := u8((1.0-a)*255 + a*122)
-	g := u8((1.0-a)*255 + a*200)
-	b := u8((1.0-a)*255 + a*255)
+	r := u8((1.0-a)*255 + a*102)
+	g := u8((1.0-a)*255 + a*178.5)
+	b := u8((1.0-a)*255 + a*255) 
 	return val_to_color(r, g, b, 255)
 }
 
