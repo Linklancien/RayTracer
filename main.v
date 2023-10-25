@@ -150,6 +150,8 @@ fn main() {
         frame_fn: on_frame
         event_fn: on_event
     )
+
+	println("Start of the program!")
 	app.cam.init()
     //lancement du programme/de la fenêtre
 	app.calcul()
