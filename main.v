@@ -170,9 +170,9 @@ fn (mut app App) calcul() {
 	for y, mut ligne in app.screen_pixels{
 		for x, mut valeur in ligne{
 			pixel_center := Point{
-				x : app.cam.view.pixel00_loc.x + y*app.cam.view.px_delta_u.x +  x*app.cam.view.px_delta_v.x
-				y : app.cam.view.pixel00_loc.y + y*app.cam.view.px_delta_u.y +  x*app.cam.view.px_delta_v.y
-				z : app.cam.view.pixel00_loc.z + y*app.cam.view.px_delta_u.z +  x*app.cam.view.px_delta_v.z
+				x : app.cam.view.pixel00_loc.x + x*app.cam.view.px_delta_u.x +  y*app.cam.view.px_delta_v.x
+				y : app.cam.view.pixel00_loc.y + x*app.cam.view.px_delta_u.y +  y*app.cam.view.px_delta_v.y
+				z : app.cam.view.pixel00_loc.z + x*app.cam.view.px_delta_u.z +  y*app.cam.view.px_delta_v.z
 			}
 			ray_direc := pixel_center - app.cam.pos
 			ray := Ray{pixel_center, ray_direc}
