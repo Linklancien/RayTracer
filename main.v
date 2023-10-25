@@ -44,8 +44,8 @@ fn (mut cam Cam) init (){
 		z : 0
 	}
 	cam.view = Viewport{
-		width  : win_width/200.0
-		height : win_height/200.0
+		width  : win_width/250
+		height : win_height/200
 	}
 	cam.view.u = Vector{
 		x : cam.view.width
@@ -80,7 +80,7 @@ fn (mut cam Cam) init (){
 	}
 	dump(cam.view.pixel00_loc)
 }
-//Viewporv.t
+//Viewport
 struct Viewport{
 	mut:
 		width  f64
@@ -117,7 +117,7 @@ struct Point {
 fn (pt1 Point) - (pt2 Point) Vector{
 	return Vector{pt1.x - pt2.x, pt1.y - pt2.y, pt1.z - pt2.z}
 }
-//Poi
+
 
 //Rays
 struct Ray{
@@ -131,6 +131,12 @@ fn (r Ray) l_inter(t f64) Point{ //Linear interpolation
 		y : r.origin.y + t*r.direction.y
 		z : r.origin.z + t*r.direction.z
     }
+}
+
+//Objts
+struct Sphere{
+	center Point
+	r f64
 }
 
 
