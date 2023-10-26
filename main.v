@@ -28,59 +28,6 @@ mut:
 	cam Cam
 }
 
-
-//Camera
-struct Cam {
-mut:
-	focal f64
-	pos Point
-	view Viewport
-}
-//Fonction pour cam
-fn (mut cam Cam) init (){
-	cam.focal = 1.0
-	cam.view = Viewport{
-		height  : 2.0
-	}
-	cam.view.width = cam.view.height * f64(win_width)/win_height
-	cam.pos = Point{
-		x : 0
-		y : 0
-		z : 0
-	}
-	cam.view.u = Vector{
-		x : cam.view.width
-		y : 0
-		z : 0
-	}
-	cam.view.v = Vector{
-		x : 0
-		y : -cam.view.height
-		z : 0
-	}
-	cam.view.px_delta_u = Vector{
-		x : cam.view.u.x/win_width
-		y : cam.view.u.y/win_width
-		z : cam.view.u.z/win_width
-	}
-	cam.view.px_delta_v = Vector{
-		x : cam.view.v.x/win_height
-		y : cam.view.v.y/win_height
-		z :	cam.view.v.z/win_height
-	}
-	cam.view.upper_left = Point{
-		x : cam.pos.x - (cam.view.u.x/2) - (cam.view.v.x/2)
-		y : cam.pos.y - (cam.view.u.y/2) - (cam.view.v.y/2)
-		z :	cam.pos.z - (cam.view.u.z/2) - (cam.view.v.z/2) - cam.focal
-	}
-	dump(cam.view.upper_left)
-	cam.view.pixel00_loc = Point{
-		x : cam.view.upper_left.x + 0.5*(cam.view.px_delta_u.x + cam.view.px_delta_v.x)
-		y : cam.view.upper_left.y + 0.5*(cam.view.px_delta_u.y + cam.view.px_delta_v.y)
-		z :	cam.view.upper_left.z + 0.5*(cam.view.px_delta_u.z + cam.view.px_delta_v.z)
-	}
-	dump(cam.view.pixel00_loc)
-}
 //Viewport
 struct Viewport{
 mut:
@@ -146,7 +93,59 @@ struct Sphere{
 	color u32
 }
 
-//
+//Camera
+struct Cam {
+mut:
+	focal f64
+	pos Point
+	view Viewport
+}
+//Fonction pour cam
+fn (mut cam Cam) init (){
+	cam.focal = 1.0
+	cam.view = Viewport{
+		height  : 2.0
+	}
+	cam.view.width = cam.view.height * f64(win_width)/win_height
+	cam.pos = Point{
+		x : 0
+		y : 0
+		z : 0
+	}
+	cam.view.u = Vector{
+		x : cam.view.width
+		y : 0
+		z : 0
+	}
+	cam.view.v = Vector{
+		x : 0
+		y : -cam.view.height
+		z : 0
+	}
+	cam.view.px_delta_u = Vector{
+		x : cam.view.u.x/win_width
+		y : cam.view.u.y/win_width
+		z : cam.view.u.z/win_width
+	}
+	cam.view.px_delta_v = Vector{
+		x : cam.view.v.x/win_height
+		y : cam.view.v.y/win_height
+		z :	cam.view.v.z/win_height
+	}
+	cam.view.upper_left = Point{
+		x : cam.pos.x - (cam.view.u.x/2) - (cam.view.v.x/2)
+		y : cam.pos.y - (cam.view.u.y/2) - (cam.view.v.y/2)
+		z :	cam.pos.z - (cam.view.u.z/2) - (cam.view.v.z/2) - cam.focal
+	}
+	dump(cam.view.upper_left)
+	cam.view.pixel00_loc = Point{
+		x : cam.view.upper_left.x + 0.5*(cam.view.px_delta_u.x + cam.view.px_delta_v.x)
+		y : cam.view.upper_left.y + 0.5*(cam.view.px_delta_u.y + cam.view.px_delta_v.y)
+		z :	cam.view.upper_left.z + 0.5*(cam.view.px_delta_u.z + cam.view.px_delta_v.z)
+	}
+	dump(cam.view.pixel00_loc)
+}
+
 fn main() {
     mut app := &App{
         gg: 0
@@ -188,7 +187,7 @@ fn (mut app App) calcul() {
 				y : app.cam.view.pixel00_loc.y + x*app.cam.view.px_delta_u.y + y*app.cam.view.px_delta_v.y
 				z : app.cam.view.pixel00_loc.z + x*app.cam.view.px_delta_u.z + y*app.cam.view.px_delta_v.z
 			}
-			ray_direc := pixel_center - app.cam.pos
+			ray_direc := (pixel_center - app.cam.pos)//.normalize() jsp si c bon
 			//print(ray_direc)
 			ray := Ray{app.cam.pos, ray_direc}
 			
@@ -215,9 +214,9 @@ fn color_pixel(ray Ray)u32{
 }
 
 fn hit_sphere(center Point, radius f64, ray Ray )bool{
-	oc := center - ray.origin
+	oc := ray.origin - center
 	a := dot(ray.direction, ray.direction)
-	b := -2.0 * dot(ray.direction, oc)
+	b := 2.0 * dot(oc, ray.direction)
 	c := dot(oc, oc) - radius*radius
 	discriminant := b*b - 4*a*c
 
