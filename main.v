@@ -6,13 +6,14 @@ module main
 //import sokol.sgl
 import gg
 import gx
+import os
 import math as m
 
 
 const(
-	aspect_ratio = 16.0/9.0
+	aspect_ratio = 16/9
 	win_width  = 400
-	win_height = 225//int(win_width/aspect_ratio)
+	win_height = 225//int(m.max(win_width/aspect_ratio, 1))
 	bg_color     = gx.black
 )
 
@@ -22,6 +23,7 @@ mut:
 	istream_idx int
 	mouse_held bool
 	mouse_coords [2]int
+	log os.File = os.open_append("log.log") or {panic(err)}
 	screen_pixels [win_height][win_width]u32 = [win_height][win_width]u32{init:[win_width]u32{ init:u32(0xFFFF_FFFF)}}
 	cam Cam
 }
@@ -121,14 +123,14 @@ fn (mut cam Cam) init (){
 		z : 0
 	}
 	cam.view.px_delta_u = Vector{
-		x : cam.view.u.x/win_width
-		y : cam.view.u.y/win_width
-		z : cam.view.u.z/win_width
+		x : cam.view.u.x/f64(win_width)
+		y : cam.view.u.y/f64(win_width)
+		z : cam.view.u.z/f64(win_width)
 	}
 	cam.view.px_delta_v = Vector{
-		x : cam.view.v.x/win_height
-		y : cam.view.v.y/win_height
-		z :	cam.view.v.z/win_height
+		x : cam.view.v.x/f64(win_height)
+		y : cam.view.v.y/f64(win_height)
+		z :	cam.view.v.z/f64(win_height)
 	}
 	cam.view.upper_left = Point{
 		x : cam.pos.x - (cam.view.u.x/2) - (cam.view.v.x/2)
@@ -178,6 +180,8 @@ fn on_frame(mut app App) {
 
 fn (mut app App) calcul() {
 	print("${win_height} lines remaining ")
+	dump(app.cam.view.px_delta_u)
+	dump(app.cam.view.px_delta_v)
 	for y, mut ligne in app.screen_pixels{
 		for x, mut valeur in ligne{
 			pixel_center := Point{
@@ -186,9 +190,10 @@ fn (mut app App) calcul() {
 				z : app.cam.view.pixel00_loc.z + x*app.cam.view.px_delta_u.z + y*app.cam.view.px_delta_v.z
 			}
 			ray_direc := (pixel_center - app.cam.pos)//.normalize() jsp si c bon
-			//dump(ray_direc)
+			
+			
 			ray := Ray{app.cam.pos, ray_direc}
-			//println(ray)
+			//app.log.write_string(ray_direc.str()) or {panic(err)}
 			
 			valeur = color_pixel(ray)
 		}
@@ -198,9 +203,10 @@ fn (mut app App) calcul() {
 }
 
 fn color_pixel(ray Ray)u32{
-	t := hit_sphere(Point{0,0,-1}, 0.5, ray) 
+	sphere_center := Point{0,0,-1}
+	t := hit_sphere(sphere_center, 0.5, ray) 
 	if t > 0.0 {
-		n := (ray.l_inter(t) - Point{0, 0, -1}).normalize()
+		n := (ray.l_inter(t) - sphere_center).normalize()
 		return val_to_color(u8(127.5*(n.x+1)), u8(127.5*(n.y+1)), u8(127.5*(n.z+1)), 255)
 	}
 
