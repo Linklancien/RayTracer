@@ -12,8 +12,9 @@ import math
 
 
 const(
-	win_width  = 1000
-	win_height = 700
+	aspect_ratio = 16.0/9.0
+	win_width  = 400
+	win_height = 225//int(win_width/aspect_ratio)
 	bg_color     = gx.black
 )
 
@@ -30,22 +31,22 @@ mut:
 
 //Camera
 struct Cam {
-	mut:
-		focal f64
-		pos Point
-		view Viewport
+mut:
+	focal f64
+	pos Point
+	view Viewport
 }
 //Fonction pour cam
 fn (mut cam Cam) init (){
 	cam.focal = 1.0
+	cam.view = Viewport{
+		height  : 2.0
+	}
+	cam.view.width = cam.view.height * f64(win_width)/win_height
 	cam.pos = Point{
 		x : 0
 		y : 0
 		z : 0
-	}
-	cam.view = Viewport{
-		width  : win_width/250
-		height : win_height/200	
 	}
 	cam.view.u = Vector{
 		x : cam.view.width
@@ -82,15 +83,15 @@ fn (mut cam Cam) init (){
 }
 //Viewport
 struct Viewport{
-	mut:
-		width  f64
-		height f64
-		u Vector
-		v Vector
-		px_delta_u Vector
-		px_delta_v Vector
-		upper_left Point
-		pixel00_loc Point
+mut:
+	width  f64
+	height f64
+	u Vector
+	v Vector
+	px_delta_u Vector
+	px_delta_v Vector
+	upper_left Point
+	pixel00_loc Point
 }
 
 //Vecteurs
@@ -199,32 +200,28 @@ fn (mut app App) calcul() {
 }
 
 fn color_pixel(ray Ray)u32{
+	if hit_sphere(Point{0,0,-1}, 0.5, ray) {
+		return val_to_color(255, 0, 0, 255)
+	}
+
 	vect := ray.direction.normalize()
 	a := 0.5*(vect.y+1)
 
 	mut r := u8((1.0-a)*255 + a*127.5)
 	mut g := u8((1.0-a)*255 + a*178.5)
 	mut b := u8((1.0-a)*255 + a*255) 
- 	if hit_sphere(Point{0,0,-1}, 0.5, ray) == true{
-		r = 125
-		g = 0
-		b = 0
-	}
-
+ 	
 	return val_to_color(r, g, b, 255)
 }
 
 fn hit_sphere(center Point, radius f64, ray Ray )bool{
-	oc := ray.origin - center
+	oc := center - ray.origin
 	a := dot(ray.direction, ray.direction)
-	b := 2.0 * dot(oc, ray.direction)
+	b := -2.0 * dot(ray.direction, oc)
 	c := dot(oc, oc) - radius*radius
 	discriminant := b*b - 4*a*c
-	mut ret := false
-	if discriminant >= 0{
-		ret = true
-	}
-    return(ret)
+
+    return discriminant >= 0
 }
 
 fn on_event(e &gg.Event, mut app App) {
