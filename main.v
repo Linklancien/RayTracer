@@ -6,9 +6,7 @@ module main
 //import sokol.sgl
 import gg
 import gx
-//import rand as rd
-//import math.bits
-import math
+import math as m
 
 
 const(
@@ -49,7 +47,7 @@ struct Vector {
 }
 //FONCTIONS POUR LES VECTEURS
 fn (vec Vector) normalize() Vector{
-	len := math.sqrt((vec.x*vec.x)+(vec.y*vec.y)+(vec.z*vec.z))
+	len := m.sqrt((vec.x*vec.x)+(vec.y*vec.y)+(vec.z*vec.z))
 	return 	Vector{
         x : vec.x/len
 		y : vec.y/len
@@ -188,8 +186,9 @@ fn (mut app App) calcul() {
 				z : app.cam.view.pixel00_loc.z + x*app.cam.view.px_delta_u.z + y*app.cam.view.px_delta_v.z
 			}
 			ray_direc := (pixel_center - app.cam.pos)//.normalize() jsp si c bon
-			//print(ray_direc)
+			//dump(ray_direc)
 			ray := Ray{app.cam.pos, ray_direc}
+			//println(ray)
 			
 			valeur = color_pixel(ray)
 		}
@@ -199,8 +198,10 @@ fn (mut app App) calcul() {
 }
 
 fn color_pixel(ray Ray)u32{
-	if hit_sphere(Point{0,0,-1}, 0.5, ray) {
-		return val_to_color(255, 0, 0, 255)
+	t := hit_sphere(Point{0,0,-1}, 0.5, ray) 
+	if t > 0.0 {
+		n := (ray.l_inter(t) - Point{0, 0, -1}).normalize()
+		return val_to_color(u8(127.5*(n.x+1)), u8(127.5*(n.y+1)), u8(127.5*(n.z+1)), 255)
 	}
 
 	vect := ray.direction.normalize()
@@ -213,14 +214,17 @@ fn color_pixel(ray Ray)u32{
 	return val_to_color(r, g, b, 255)
 }
 
-fn hit_sphere(center Point, radius f64, ray Ray )bool{
+fn hit_sphere(center Point, radius f64, ray Ray ) f64 {
 	oc := ray.origin - center
 	a := dot(ray.direction, ray.direction)
 	b := 2.0 * dot(oc, ray.direction)
 	c := dot(oc, oc) - radius*radius
 	discriminant := b*b - 4*a*c
-
-    return discriminant >= 0
+	if discriminant < 0 {
+		return -1.0
+	} else {
+		return (-b - m.sqrt(discriminant))/(2.0*a)
+	}
 }
 
 fn on_event(e &gg.Event, mut app App) {
