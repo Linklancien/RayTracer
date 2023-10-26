@@ -38,13 +38,16 @@ fn (vec Vector) multf(t f64) Vector{
 	return Vector{vec.x*t, vec.y*t, vec.z*t}
 }
 
+fn (vec Vector) lenght() f64 {
+	return m.sqrt(dot(vec, vec))
+}
+
 fn (vec Vector) normalize() Vector{
-	len := m.sqrt((vec.x*vec.x)+(vec.y*vec.y)+(vec.z*vec.z))
-	return vec.divf(len)
+	return vec.divf(vec.lenght())
 }
 
 fn dot(v1 Vector, v2 Vector) f64 { // produit scalaire (dot product)
-	return v1.x*v2.x + v1.y+v2.y + v1.z*v2.z
+	return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z
 }
 
 fn (v1 Vector) + (v2 Vector) Vector {
@@ -80,7 +83,7 @@ fn hit_sphere(center Point, radius f64, r Ray) bool {
 }
 
 fn ray_color(r Ray) []u8 {
-	if hit_sphere(Point{0, 0, -1}, 0.15, r) {
+	if hit_sphere(Point{0, 0, -1}, 0.5, r) {
 		computed_value := Vector{1.0, 0.0, 0.0}
 		return computed_value.to_color()
 	}
