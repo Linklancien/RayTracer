@@ -1,6 +1,5 @@
-import gg
-import gx
 import math as m
+import stbi
 import os
 
 struct Point {
@@ -61,13 +60,14 @@ fn (r Ray) at(t f64) Point{ //Linear interpolation (lerp)
 	return r.origin.addv(r.dir.multf(t))
 }
 
-fn (v Vector) to_color() u32 {
+fn (v Vector) to_color() []u8 {
+	/*
 	mut color := u32(0)
 	color = (color|u8(255)) << 8
 	color = (color|u8(v.z*255)) << 8
 	color = (color|u8(v.y*255)) << 8
-	color = (color|u8(v.x*255))
-	return color
+	color = (color|u8(v.x*255))*/
+	return [u8(v.x*255), u8(v.y*255), u8(v.z*255), 255]
 }
 
 fn hit_sphere(center Point, radius f64, r Ray) bool {
@@ -79,7 +79,7 @@ fn hit_sphere(center Point, radius f64, r Ray) bool {
 	return discriminant >= 0
 }
 
-fn ray_color(r Ray) u32 {
+fn ray_color(r Ray) []u8 {
 	if hit_sphere(Point{0, 0, -1}, 0.15, r) {
 		computed_value := Vector{1.0, 0.0, 0.0}
 		return computed_value.to_color()
@@ -113,76 +113,20 @@ fn main() {
 	viewport_upper_left := camera_center.subv(Vector{0, 0, focal_length}).subv(viewport_u.divf(2)).subv(viewport_v.divf(2))
 	pixel00_loc := viewport_upper_left.addv(pixel_delta_u.divf(2)).addv(pixel_delta_v.divf(2))
 
-	mut app := &App{
-        gg: 0
-		image_height: image_height
-		image_width: image_width
-    }
-    app.gg = gg.new_context(
-        width: 399//app.image_width
-        height: 400//app.image_height
-        create_window: true
-        window_title: 'Rays simulation'
-        user_data: app
-		init_fn: graphics_init
-        frame_fn: on_frame
-		event_fn: on_event
-    )
 	println(image_width)
 	println(image_height)
-
+	mut image := []u8{cap:image_height*4*image_width}
 	print("\n${image_height} lines remaining ")
 	for j := 0; j < image_height; j++ {
 		for i := 0; i < image_width; i++ {
 			pixel_center := pixel00_loc.addv(pixel_delta_u.multf(f64(i))).addv(pixel_delta_v.multf(f64(j)))
 			ray_direction := pixel_center.subp(camera_center)
 			ray := Ray{camera_center, ray_direction}
-			app.image[j][i] = ray_color(ray)
+			image << ray_color(ray)
 		}
 		print("\r${image_height-j} ")
 	}
-	app.log.write_string(app.image.str()) or {panic(err)}
+	stbi.stbi_write_jpg("render.png", image_width, image_height, 4, &(image[0]), image_width*4) or {panic(err)}
 	println("\rDone                ")
-	app.gg.run()
-}
-
-struct App {
-mut:
-    gg    &gg.Context = unsafe { nil }
-	bg_color gx.Color = gx.black
-	istream_idx int
-	log os.File = os.open_append("log.log") or {panic(err)}
-	image [399][400]u32 = [399][400]u32{init:[400]u32{init:u32(0xFFFF_FFFF)}}
-	image_height int
-	image_width int
-}
-
-fn on_frame(mut app App) {
-	//Draw
-	app.gg.begin()
-	app.draw()
-	app.gg.show_fps()
-	app.gg.end()
-}
-
-fn on_event(e &gg.Event, mut app App) {
-	match e.typ {
-        .key_down {
-            match e.key_code {
-                .escape {app.gg.quit()}
-                else {}
-            }
-        }
-        else {}
-    }
-}
-
-fn graphics_init(mut app App) {
-	app.istream_idx = app.gg.new_streaming_image(400, 399, 4, pixel_format: .rgba8)
-}
-
-fn (mut app App) draw() {
-	mut istream_image := app.gg.get_cached_image_by_idx(app.istream_idx)
-	istream_image.update_pixel_data(unsafe { &u8(&app.image) })
-	app.gg.draw_image(0, 0, 400, 399, istream_image)
+	os.execute("start \" \" \"render.png\"")
 }
