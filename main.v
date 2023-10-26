@@ -45,7 +45,7 @@ fn (mut cam Cam) init (){
 	}
 	cam.view = Viewport{
 		width  : win_width/250
-		height : win_height/200
+		height : win_height/200	
 	}
 	cam.view.u = Vector{
 		x : cam.view.width
@@ -142,6 +142,7 @@ fn (r Ray) l_inter(t f64) Point{ //Linear interpolation
 struct Sphere{
 	center Point
 	r f64
+	color u32
 }
 
 //
@@ -201,12 +202,30 @@ fn color_pixel(ray Ray)u32{
 	vect := ray.direction.normalize()
 	a := 0.5*(vect.y+1)
 
-	r := u8((1.0-a)*255 + a*127.5)
-	g := u8((1.0-a)*255 + a*178.5)
-	b := u8((1.0-a)*255 + a*255) 
+	mut r := u8((1.0-a)*255 + a*127.5)
+	mut g := u8((1.0-a)*255 + a*178.5)
+	mut b := u8((1.0-a)*255 + a*255) 
+ 	if hit_sphere(Point{0,0,-1}, 0.5, ray) == true{
+		r = 125
+		g = 0
+		b = 0
+	}
+
 	return val_to_color(r, g, b, 255)
 }
 
+fn hit_sphere(center Point, radius f64, ray Ray )bool{
+	oc := ray.origin - center
+	a := dot(ray.direction, ray.direction)
+	b := 2.0 * dot(oc, ray.direction)
+	c := dot(oc, oc) - radius*radius
+	discriminant := b*b - 4*a*c
+	mut ret := false
+	if discriminant >= 0{
+		ret = true
+	}
+    return(ret)
+}
 
 fn on_event(e &gg.Event, mut app App) {
 	
