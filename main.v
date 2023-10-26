@@ -60,7 +60,7 @@ fn (vec Vector) normalize() Vector {
 }
 
 fn dot(v1 Vector, v2 Vector) f64 { // produit scalaire (dot product)
-	return v1.x * v2.x + v1.y + v2.y + v1.z * v2.z
+	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
 }
 
 struct Point {

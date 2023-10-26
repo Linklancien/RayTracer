@@ -73,19 +73,25 @@ fn (v Vector) to_color() []u8 {
 	return [u8(v.x * 255), u8(v.y * 255), u8(v.z * 255), 255]
 }
 
-fn hit_sphere(center Point, radius f64, r Ray) bool {
+fn hit_sphere(center Point, radius f64, r Ray) f64 {
 	oc := r.origin - center
 	a := dot(r.dir, r.dir)
-	b := 2.0 * dot(oc, r.dir)
+	half_b := dot(oc, r.dir)
 	c := dot(oc, oc) - radius * radius
-	discriminant := b * b - 4 * a * c
-	return discriminant >= 0
+	discriminant := half_b * half_b - a * c
+	if discriminant < 0 {
+        return -1.0
+    } else {
+        return (-half_b - m.sqrt(discriminant) ) / a
+    }
 }
 
 fn ray_color(r Ray) []u8 {
-	if hit_sphere(Point{0, 0, -1}, 0.5, r) {
-		computed_value := Vector{1.0, 0.0, 0.0}
-		return computed_value.to_color()
+	t := hit_sphere(Point{0, 0, -1}, 0.5, r)
+	if t > 0.0  {
+        /*return 0.5*color(N.x()+1, N.y()+1, N.z()+1);*/
+		computed_value := (r.at(t).subp(Point{0,0,-1})).normalize()
+		return (computed_value+Vector{1, 1, 1}).multf(0.5).to_color()
 	}
 	unit_direction := r.dir.normalize()
 	a := 0.5 * (unit_direction.y + 1.0)
