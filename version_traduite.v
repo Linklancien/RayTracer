@@ -2,6 +2,16 @@ import math as m
 import stbi
 import os
 
+const(
+	infinity = 1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000.0
+	pi = m.pi
+)
+
+[inline]
+fn degrees_to_radians(degrees f64) f64{
+	return degrees * pi / 180.0
+}
+
 struct Point {
 	x f64
 	y f64
