@@ -67,7 +67,7 @@ fn (r Ray) at(t f64) Point { // Linear interpolation (lerp)
 	return r.origin.addv(r.dir.multf(t))
 }
 
-struct Hit_Record {
+struct HitRecord {
 mut:
 	p          Point
 	normal     Vector
@@ -75,14 +75,35 @@ mut:
 	front_face bool
 }
 
-fn (mut rec Hit_Record) set_face_normal(r Ray, outward_normal Vector) {
+fn (mut rec HitRecord) set_face_normal(r Ray, outward_normal Vector) {
 	rec.front_face = dot(r.dir, outward_normal) < 0
 	rec.normal = if rec.front_face { outward_normal } else { outward_normal.invert() }
 }
 
 interface Hittable {
-	// const ray& r, double ray_tmin, double ray_tmax, hit_record& rec
-	hit(r Ray, ray_tmin f64, ray_tmax f64, rec Hit_Record) bool
+	// const ray& r, double ray_tmin, double ray_tmax, HitRecord& rec
+	hit(r Ray, ray_tmin f64, ray_tmax f64, mut rec HitRecord) bool
+}
+
+struct HittableList {
+mut:
+	objects []Hittable
+}
+
+fn (list HittableList) hit(r Ray, ray_tmin f64, ray_tmax f64, mut rec HitRecord) bool {
+	mut temp_rec := HitRecord{}
+	mut hit_anything := false
+	mut closest_so_far := ray_tmax
+
+	for object in list.objects {
+		if object.hit(r, ray_tmin, closest_so_far, mut temp_rec) {
+			hit_anything = true
+			closest_so_far = temp_rec.t
+			rec = temp_rec
+		}
+	}
+
+	return hit_anything
 }
 
 struct Sphere {
@@ -90,7 +111,7 @@ struct Sphere {
 	radius f64
 }
 
-fn (s Sphere) hit(r Ray, ray_tmin f64, ray_tmax f64, mut rec Hit_Record) bool {
+fn (s Sphere) hit(r Ray, ray_tmin f64, ray_tmax f64, mut rec HitRecord) bool {
 	oc := r.origin - s.center
 	a := dot(r.dir, r.dir)
 	half_b := dot(oc, r.dir)
@@ -113,7 +134,7 @@ fn (s Sphere) hit(r Ray, ray_tmin f64, ray_tmax f64, mut rec Hit_Record) bool {
 	rec.t = root
 	rec.p = r.at(rec.t)
 	outward_normal := (rec.p - s.center).divf(s.radius)
-    rec.set_face_normal(r, outward_normal)
+	rec.set_face_normal(r, outward_normal)
 
 	return true
 }
