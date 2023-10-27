@@ -54,6 +54,10 @@ fn (v1 Vector) + (v2 Vector) Vector {
 	return Vector{v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}
 }
 
+fn (vec Vector) invert() Vector {
+	return Vector{-vec.x, -vec.y, -vec.z}
+}
+
 struct Ray {
 	origin Point
 	dir    Vector
@@ -64,14 +68,20 @@ fn (r Ray) at(t f64) Point { // Linear interpolation (lerp)
 }
 
 struct Hit_Record {
-	mut:
-		p Point
-		normal Vector
-		t f64
+mut:
+	p          Point
+	normal     Vector
+	t          f64
+	front_face bool
 }
 
-interface Hittable  {
-	//const ray& r, double ray_tmin, double ray_tmax, hit_record& rec
+fn (mut rec Hit_Record) set_face_normal(r Ray, outward_normal Vector) {
+	rec.front_face = dot(r.dir, outward_normal) < 0
+	rec.normal = if rec.front_face { outward_normal } else { outward_normal.invert() }
+}
+
+interface Hittable {
+	// const ray& r, double ray_tmin, double ray_tmax, hit_record& rec
 	hit(r Ray, ray_tmin f64, ray_tmax f64, rec Hit_Record) bool
 }
 
@@ -86,14 +96,18 @@ fn (s Sphere) hit(r Ray, ray_tmin f64, ray_tmax f64, mut rec Hit_Record) bool {
 	half_b := dot(oc, r.dir)
 	c := dot(oc, oc) - s.radius * s.radius
 	discriminant := half_b * half_b - a * c
-	if discriminant < 0 { return false }
+	if discriminant < 0 {
+		return false
+	}
 	sqrtd := m.sqrt(discriminant)
-	
+
 	// Find the nearest root that lies in the acceptable range.
 	mut root := (-half_b - sqrtd) / a
-	if root <= ray_tmin || ray_tmax <= root{
+	if root <= ray_tmin || ray_tmax <= root {
 		root = (-half_b + sqrtd) / a
-		if root <= ray_tmin || ray_tmax <= root{ return false }
+		if root <= ray_tmin || ray_tmax <= root {
+			return false
+		}
 	}
 
 	rec.t = root
@@ -120,18 +134,17 @@ fn hit_sphere(center Point, radius f64, r Ray) f64 {
 	c := dot(oc, oc) - radius * radius
 	discriminant := half_b * half_b - a * c
 	if discriminant < 0 {
-        return -1.0
-    } else {
-        return (-half_b - m.sqrt(discriminant) ) / a
-    }
+		return -1.0
+	} else {
+		return (-half_b - m.sqrt(discriminant)) / a
+	}
 }
 
 fn ray_color(r Ray) []u8 {
 	t := hit_sphere(Point{0, 0, -1}, 0.5, r)
-	if t > 0.0  {
-        /*return 0.5*color(N.x()+1, N.y()+1, N.z()+1);*/
-		computed_value := (r.at(t).subp(Point{0,0,-1})).normalize()
-		return (computed_value+Vector{1, 1, 1}).multf(0.5).to_color()
+	if t > 0.0 {
+		computed_value := (r.at(t).subp(Point{0, 0, -1})).normalize()
+		return (computed_value + Vector{1, 1, 1}).multf(0.5).to_color()
 	}
 	unit_direction := r.dir.normalize()
 	a := 0.5 * (unit_direction.y + 1.0)

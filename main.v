@@ -26,7 +26,7 @@ mut:
 	screen_pixels [win_height][win_width]u32 = [win_height][win_width]u32{init: [
 	win_width,
 ]u32{init: u32(0xFFFF_FFFF)}}
-	cam           Cam
+	cam Cam
 }
 
 // Viewport
@@ -198,7 +198,6 @@ fn (mut app App) calcul() {
 					y * app.cam.view.px_delta_v.z
 			}
 			ray_direc := (pixel_center - app.cam.pos) //.normalize() jsp si c bon
-
 			ray := Ray{app.cam.pos, ray_direc}
 
 			// app.log.write_string(ray_direc.str()) or {panic(err)}

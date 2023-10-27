@@ -1,15 +1,19 @@
 interface Truc {
 	fonc(a int) bool
 }
-struct Bidule{
+
+struct Bidule {
 	x int
 }
+
 fn (b Bidule) fonc(a int) bool {
 	return true
 }
+
 struct Chose {
 	y f64
 }
+
 fn (b Chose) fonc(a int) bool {
 	return false
 }
