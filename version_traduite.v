@@ -64,9 +64,10 @@ fn (r Ray) at(t f64) Point { // Linear interpolation (lerp)
 }
 
 struct Hit_Record {
-	p Point
-	normal Vector
-	t f64
+	mut:
+		p Point
+		normal Vector
+		t f64
 }
 
 interface Hittable  {
@@ -79,27 +80,27 @@ struct Sphere {
 	radius f64
 }
 
-fn (s Sphere) hit_sphere(center Point, radius f64, r Ray) bool {
-	oc := r.origin - center
+fn (s Sphere) hit(r Ray, ray_tmin f64, ray_tmax f64, mut rec Hit_Record) bool {
+	oc := r.origin - s.center
 	a := dot(r.dir, r.dir)
 	half_b := dot(oc, r.dir)
-	c := dot(oc, oc) - radius * radius
+	c := dot(oc, oc) - s.radius * s.radius
 	discriminant := half_b * half_b - a * c
 	if discriminant < 0 { return false }
 	sqrtd := m.sqrt(discriminant)
 	
 	// Find the nearest root that lies in the acceptable range.
-	root := (-half_b - sqrtd) / a
+	mut root := (-half_b - sqrtd) / a
 	if root <= ray_tmin || ray_tmax <= root{
 		root = (-half_b + sqrtd) / a
 		if root <= ray_tmin || ray_tmax <= root{ return false }
 	}
 
-	rec.t = root;
-	rec.p = r.at(rec.t);
-	rec.normal = (rec.p - center) / radius;
+	rec.t = root
+	rec.p = r.at(rec.t)
+	rec.normal = (rec.p - s.center).divf(s.radius)
 
-	return true;
+	return true
 }
 
 fn (v Vector) to_color() []u8 {
