@@ -112,7 +112,8 @@ fn (s Sphere) hit(r Ray, ray_tmin f64, ray_tmax f64, mut rec Hit_Record) bool {
 
 	rec.t = root
 	rec.p = r.at(rec.t)
-	rec.normal = (rec.p - s.center).divf(s.radius)
+	outward_normal := (rec.p - s.center).divf(s.radius)
+    rec.set_face_normal(r, outward_normal)
 
 	return true
 }
