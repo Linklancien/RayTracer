@@ -32,12 +32,12 @@ fn (vec Vector) invert() Vector {
 	return Vector{-vec.x, -vec.y, -vec.z}
 }
 
-fn (v Vector) to_color() []u8 {
+fn (v Vector) to_color() Vector {
 	/*
 	mut color := u32(0)
 	color = (color|u8(255)) << 8
 	color = (color|u8(v.z*255)) << 8
 	color = (color|u8(v.y*255)) << 8
 	color = (color|u8(v.x*255))*/
-	return [u8(v.x * 255), u8(v.y * 255), u8(v.z * 255)]
+	return v.multf(255)
 }

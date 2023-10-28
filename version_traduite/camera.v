@@ -48,15 +48,16 @@ fn (mut c Camera) render(world Hittable) {
 	mut image := []u8{cap: c.image_height * 4 * c.image_width}
 	print('\n${c.image_height} lines remaining ')
 	color_scale := 1.0/f64(c.samples_per_pixel)
+	mut color := [f64(0), 0, 0]
 	for j := 0; j < c.image_height; j++ {
 		for i := 0; i < c.image_width; i++ {
-			mut color := [f64(0), 0, 0]
+			color = [f64(0), 0, 0]
 			for _ in 0..c.samples_per_pixel {
 				ray := c.get_ray(i, j)
 				sample_color := ray_color(ray, world)
-				color[0] += sample_color[0]
-				color[1] += sample_color[1]
-				color[2] += sample_color[2]
+				color[0] += sample_color.x
+				color[1] += sample_color.y
+				color[2] += sample_color.z
 			}
 			color[0] *= color_scale
 			color[1] *= color_scale
@@ -81,14 +82,14 @@ fn (mut c Camera) get_ray(i int, j int) Ray {
 }
 
 [inline]
-fn (mut c Camera) pixel_sample_square() Vector {
+fn (mut c Camera) pixel_sample_square() Vector { // maybe replace later by a smooth distribution? in a circle ?
 	px := -0.5 + c.rd.rd_f64()
 	py := -0.5 + c.rd.rd_f64()
 	return c.pixel_delta_u.multf(px) + c.pixel_delta_v.multf(py)
 }
 
 [inline]
-fn ray_color(r Ray, world Hittable) []u8 {
+fn ray_color(r Ray, world Hittable) Vector {
 	mut rec := HitRecord{}
 	if world.hit(r, Interval{0, infinity}, mut rec) {
 		return (rec.normal + Vector{1, 1, 1}).multf(0.5).to_color()
