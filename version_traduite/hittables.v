@@ -1,5 +1,3 @@
-import math as m
-
 interface Hittable {
 	// const ray& r, double ray_tmin, double ray_tmax, HitRecord& rec
 	hit(r Ray, ray_t Interval, mut rec HitRecord) bool
@@ -40,7 +38,7 @@ fn (s Sphere) hit(r Ray, ray_t Interval, mut rec HitRecord) bool {
 	if discriminant < 0 {
 		return false
 	}
-	sqrtd := m.sqrt(discriminant)
+	sqrtd := sqrt(discriminant)
 
 	// Find the nearest root that lies in the acceptable range.
 	mut root := (-half_b - sqrtd) / a

@@ -16,6 +16,7 @@ mut:
 	viewport_v Vector
 	viewport_upper_left Point
 	samples_per_pixel int = 10
+	rd Rand
 }
 
 fn (mut c Camera) initialize() {
@@ -40,6 +41,7 @@ fn (mut c Camera) initialize() {
 
 }
 
+[direct_array_access]
 fn (mut c Camera) render(world Hittable) {
 	c.initialize()
 
@@ -69,20 +71,23 @@ fn (mut c Camera) render(world Hittable) {
 	println('\rDone                ')
 }
 
-fn (c Camera) get_ray(i int, j int) Ray {
-	pixel_center := c.pixel00_loc.addv(c.pixel_delta_u.multf(f64(i))).addv(c.pixel_delta_v.multf(f64(j)))
+[inline]
+fn (mut c Camera) get_ray(i int, j int) Ray {
+	pixel_center := c.pixel00_loc.addv(c.pixel_delta_u.multf(i)).addv(c.pixel_delta_v.multf(j))
 	pixel_sample := pixel_center.addv(c.pixel_sample_square())
 	ray_origin := c.center
 	ray_direction := pixel_sample.subp(c.center)
 	return Ray{ray_origin, ray_direction}
 }
 
-fn (c Camera) pixel_sample_square() Vector {
-	px := -0.5 + random_f64()
-	py := -0.5 + random_f64()
+[inline]
+fn (mut c Camera) pixel_sample_square() Vector {
+	px := -0.5 + c.rd.rd_f64()
+	py := -0.5 + c.rd.rd_f64()
 	return c.pixel_delta_u.multf(px) + c.pixel_delta_v.multf(py)
 }
 
+[inline]
 fn ray_color(r Ray, world Hittable) []u8 {
 	mut rec := HitRecord{}
 	if world.hit(r, Interval{0, infinity}, mut rec) {

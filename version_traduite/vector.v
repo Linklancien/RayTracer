@@ -1,5 +1,3 @@
-import math as m
-
 struct Vector {
 	x f64
 	y f64
@@ -15,7 +13,7 @@ fn (vec Vector) multf(t f64) Vector {
 }
 
 fn (vec Vector) lenght() f64 {
-	return m.sqrt(dot(vec, vec))
+	return sqrt(dot(vec, vec))
 }
 
 fn (vec Vector) normalize() Vector {
