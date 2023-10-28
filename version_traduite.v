@@ -159,24 +159,10 @@ fn (v Vector) to_color() []u8 {
 	return [u8(v.x * 255), u8(v.y * 255), u8(v.z * 255), 255]
 }
 
-fn hit_sphere(center Point, radius f64, r Ray) f64 {
-	oc := r.origin - center
-	a := dot(r.dir, r.dir)
-	half_b := dot(oc, r.dir)
-	c := dot(oc, oc) - radius * radius
-	discriminant := half_b * half_b - a * c
-	if discriminant < 0 {
-		return -1.0
-	} else {
-		return (-half_b - m.sqrt(discriminant)) / a
-	}
-}
-
-fn ray_color(r Ray) []u8 {
-	t := hit_sphere(Point{0, 0, -1}, 0.5, r)
-	if t > 0.0 {
-		computed_value := (r.at(t).subp(Point{0, 0, -1})).normalize()
-		return (computed_value + Vector{1, 1, 1}).multf(0.5).to_color()
+fn ray_color(r Ray, world Hittable) []u8 {
+	mut rec := HitRecord{}
+	if world.hit(r, 0, infinity, mut rec) {
+		return (rec.normal + Vector{1, 1, 1}).multf(0.5).to_color()
 	}
 	unit_direction := r.dir.normalize()
 	a := 0.5 * (unit_direction.y + 1.0)
@@ -191,6 +177,10 @@ fn main() {
 	aspect_ratio := 16.0 / 9.0
 	image_width := 400
 	image_height := int(m.max(f64(image_width) / aspect_ratio, 1.0))
+
+	mut world := HittableList{}
+	world.objects << Sphere{Point{0, 0, -1}, 0.5}
+	world.objects << Sphere{Point{0, -100.5, -1}, 100}
 
 	// Camera
 	focal_length := 1.0
@@ -216,7 +206,7 @@ fn main() {
 			pixel_center := pixel00_loc.addv(pixel_delta_u.multf(f64(i))).addv(pixel_delta_v.multf(f64(j)))
 			ray_direction := pixel_center.subp(camera_center)
 			ray := Ray{camera_center, ray_direction}
-			image << ray_color(ray)
+			image << ray_color(ray, world)
 		}
 		print('\r${image_height - j} ')
 	}
