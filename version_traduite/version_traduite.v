@@ -6,11 +6,6 @@ const(
 	pi = m.pi
 )
 
-[inline]
-fn degrees_to_radians(degrees f64) f64{
-	return degrees * pi / 180.0
-}
-
 fn main() {
 	mut world := HittableList{}
 	world.objects << Sphere{Point{0, 0, -1}, 0.5}
