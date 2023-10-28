@@ -41,5 +41,5 @@ fn (v Vector) to_color() []u8 {
 	color = (color|u8(v.z*255)) << 8
 	color = (color|u8(v.y*255)) << 8
 	color = (color|u8(v.x*255))*/
-	return [u8(v.x * 255), u8(v.y * 255), u8(v.z * 255), 255]
+	return [u8(v.x * 255), u8(v.y * 255), u8(v.z * 255)]
 }

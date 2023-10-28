@@ -15,6 +15,7 @@ mut:
 	viewport_u Vector
 	viewport_v Vector
 	viewport_upper_left Point
+	samples_per_pixel int = 10
 }
 
 fn (mut c Camera) initialize() {
@@ -44,12 +45,21 @@ fn (mut c Camera) render(world Hittable) {
 
 	mut image := []u8{cap: c.image_height * 4 * c.image_width}
 	print('\n${c.image_height} lines remaining ')
+	color_scale := 1.0/f64(c.samples_per_pixel)
 	for j := 0; j < c.image_height; j++ {
 		for i := 0; i < c.image_width; i++ {
-			pixel_center := c.pixel00_loc.addv(c.pixel_delta_u.multf(f64(i))).addv(c.pixel_delta_v.multf(f64(j)))
-			ray_direction := pixel_center.subp(c.center)
-			ray := Ray{c.center, ray_direction}
-			image << ray_color(ray, world)
+			mut color := [f64(0), 0, 0]
+			for _ in 0..c.samples_per_pixel {
+				ray := c.get_ray(i, j)
+				sample_color := ray_color(ray, world)
+				color[0] += sample_color[0]
+				color[1] += sample_color[1]
+				color[2] += sample_color[2]
+			}
+			color[0] *= color_scale
+			color[1] *= color_scale
+			color[2] *= color_scale
+			image << [u8(color[0]), u8(color[1]), u8(color[2]), 255]
 		}
 		print('\r${c.image_height - j} ')
 	}
@@ -57,6 +67,20 @@ fn (mut c Camera) render(world Hittable) {
 		panic(err)
 	}
 	println('\rDone                ')
+}
+
+fn (c Camera) get_ray(i int, j int) Ray {
+	pixel_center := c.pixel00_loc.addv(c.pixel_delta_u.multf(f64(i))).addv(c.pixel_delta_v.multf(f64(j)))
+	pixel_sample := pixel_center.addv(c.pixel_sample_square())
+	ray_origin := c.center
+	ray_direction := pixel_sample.subp(c.center)
+	return Ray{ray_origin, ray_direction}
+}
+
+fn (c Camera) pixel_sample_square() Vector {
+	px := -0.5 + random_f64()
+	py := -0.5 + random_f64()
+	return c.pixel_delta_u.multf(px) + c.pixel_delta_v.multf(py)
 }
 
 fn ray_color(r Ray, world Hittable) []u8 {
