@@ -99,7 +99,7 @@ fn (mut c Camera) ray_color(r Ray, depth int, world Hittable) Vector {
 	}
 
 	if world.hit(r, Interval{0.001, infinity}, mut rec) {
-		direction := c.random_on_hemisphere(rec.normal)
+		direction := rec.normal + c.random_unit_vector();
 		return c.ray_color(Ray{rec.p, direction}, depth-1, world).multf(0.5)
 	}
 	unit_direction := r.dir.normalize()
