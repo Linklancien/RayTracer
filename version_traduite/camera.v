@@ -67,7 +67,7 @@ fn (mut c Camera) render(world Hittable) {
 			color[0] = linear_to_gamma(color[0])
 			color[1] = linear_to_gamma(color[1])
 			color[2] = linear_to_gamma(color[2])
-			image << [u8(color[0]), u8(color[1]), u8(color[2]), 255]
+			image << [u8(color[0]*255), u8(color[1]*255), u8(color[2]*255), 255]
 		}
 		print('\r${c.image_height - j} ')
 	}
@@ -78,7 +78,7 @@ fn (mut c Camera) render(world Hittable) {
 }
 
 fn linear_to_gamma(linear_component f64)f64{
-    return linear_component //sqrt()
+    return sqrt(linear_component)
 }
 
 [inline]
