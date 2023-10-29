@@ -1,3 +1,4 @@
+import time
 import math as m
 import os
 
@@ -7,6 +8,8 @@ const(
 )
 
 fn main() {
+	start_time := time.now()
+	println('Started at ${start_time}')
 	mut world := HittableList{}
 	world.objects << Sphere{Point{0, 0, -1}, 0.5}
 	world.objects << Sphere{Point{0, -100.5, -1}, 100}
@@ -19,5 +22,7 @@ fn main() {
 	cam.max_depth         = 50
 
 	cam.render(world)
+	finish_time := time.now()
+	println('Finished at ${finish_time}, took ${finish_time-start_time}')
 	os.execute('start " " "render.png"')
 }
