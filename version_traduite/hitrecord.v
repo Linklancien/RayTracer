@@ -2,6 +2,7 @@ struct HitRecord {
 mut:
 	p          Point
 	normal     Vector
+	mat	Material
 	t          f64
 	front_face bool
 }

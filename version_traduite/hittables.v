@@ -27,6 +27,7 @@ fn (list HittableList) hit(r Ray, ray_t Interval, mut rec HitRecord) bool {
 struct Sphere {
 	center Point
 	radius f64
+	mat Material
 }
 
 fn (s Sphere) hit(r Ray, ray_t Interval, mut rec HitRecord) bool {
@@ -53,6 +54,7 @@ fn (s Sphere) hit(r Ray, ray_t Interval, mut rec HitRecord) bool {
 	rec.p = r.at(rec.t)
 	outward_normal := (rec.p - s.center).divf(s.radius)
 	rec.set_face_normal(r, outward_normal)
+	rec.mat = s.mat
 
 	return true
 }
