@@ -47,7 +47,7 @@ fn (mut c Camera) render(world Hittable) {
 	c.initialize()
 
 	mut image := []u8{cap: c.image_height * 4 * c.image_width}
-	print('\n${c.image_height} lines remaining ')
+	print('${c.image_height} lines remaining ')
 	color_scale := 1.0/f64(c.samples_per_pixel)
 	mut color := [f64(0), 0, 0]
 	for j := 0; j < c.image_height; j++ {
