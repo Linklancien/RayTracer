@@ -17,7 +17,7 @@ fn (vec Vector) lenght_squared() f64 {
 }
 
 fn (vec Vector) lenght() f64 {
-	return sqrt(dot(vec, vec))
+	return sqrt(vec.lenght_squared())
 }
 
 fn (vec Vector) normalize() Vector {

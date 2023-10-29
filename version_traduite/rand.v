@@ -1,3 +1,5 @@
+import rand as r
+
 const (
 	reciprocal_2_52nd = 1.0 / f64(u64(1) << 52)
 )
@@ -6,6 +8,11 @@ struct Rand {
 	mut: seed u64
 }
 
+fn (mut rd Rand) rd_u64() u64 {
+	return r.u64()
+}
+
+/*
 [inline]
 fn (mut rd Rand) rd_u64() u64{
 	rd.seed += 1
@@ -24,7 +31,7 @@ fn (mut rd Rand) rd_u64() u64{
 	hi := x1 * y1 + w2 + (w1 >> 32)
 	lo := a * b
 	return hi ^ lo
-}
+}*/
 
 [inline]
 fn (mut rd Rand) rd_f64() f64 {

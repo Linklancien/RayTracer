@@ -137,7 +137,7 @@ fn (mut c Camera) random_unit_vector() Vector {
 
 fn (mut c Camera) random_on_hemisphere(normal Vector) Vector {
 	on_unit_sphere := c.random_unit_vector()
-	if dot(on_unit_sphere, normal) > 0.0 {
+	if dot(on_unit_sphere, normal) >= 0.0 {
 		return on_unit_sphere
 	}else {
 		return on_unit_sphere.invert()
