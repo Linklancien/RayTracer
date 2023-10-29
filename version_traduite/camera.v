@@ -54,7 +54,7 @@ fn (mut c Camera) render(world Hittable) {
 			color = [f64(0), 0, 0]
 			for _ in 0..c.samples_per_pixel {
 				ray := c.get_ray(i, j)
-				sample_color := ray_color(ray, world)
+				sample_color := c.ray_color(ray, world)
 				color[0] += sample_color.x
 				color[1] += sample_color.y
 				color[2] += sample_color.z
@@ -89,12 +89,42 @@ fn (mut c Camera) pixel_sample_square() Vector { // maybe replace later by a smo
 }
 
 [inline]
-fn ray_color(r Ray, world Hittable) Vector {
+fn (mut c Camera) ray_color(r Ray, world Hittable) Vector {
 	mut rec := HitRecord{}
 	if world.hit(r, Interval{0, infinity}, mut rec) {
-		return (rec.normal + Vector{1, 1, 1}).multf(0.5).to_color()
+		direction := c.random_on_hemisphere(rec.normal)
+		return c.ray_color(Ray{rec.p, direction}, world).multf(0.5)
 	}
 	unit_direction := r.dir.normalize()
 	a := 0.5 * (unit_direction.y + 1.0)
 	return (Vector{1.0, 1.0, 1.0}.multf(1.0 - a) + Vector{0.5, 0.7, 1.0}.multf(a)).to_color()
+}
+
+fn (mut c Camera) random_vector() Vector {
+	return Vector{c.rd.rd_f64(), c.rd.rd_f64(), c.rd.rd_f64()}
+}
+
+fn (mut c Camera) random_vector_between(min f64, max f64) Vector {
+	return Vector{c.rd.rd_f64_between(min, max), c.rd.rd_f64_between(min, max), c.rd.rd_f64_between(min, max)}
+}
+
+fn (mut c Camera) random_vector_unit_sphere() Vector {
+	mut p := c.random_vector_between(-1, 1)
+	for p.lenght_squared() >= 1 {
+		p = c.random_vector_between(-1, 1)
+	}
+	return p
+}
+
+fn (mut c Camera) random_unit_vector() Vector {
+	return c.random_vector_unit_sphere().normalize()
+}
+
+fn (mut c Camera) random_on_hemisphere(normal Vector) Vector {
+	on_unit_sphere := c.random_unit_vector()
+	if dot(on_unit_sphere, normal) > 0.0 {
+		return on_unit_sphere
+	}else {
+		return on_unit_sphere.invert()
+	}
 }

@@ -12,6 +12,10 @@ fn (vec Vector) multf(t f64) Vector {
 	return Vector{vec.x * t, vec.y * t, vec.z * t}
 }
 
+fn (vec Vector) lenght_squared() f64 {
+	return dot(vec, vec)
+}
+
 fn (vec Vector) lenght() f64 {
 	return sqrt(dot(vec, vec))
 }
