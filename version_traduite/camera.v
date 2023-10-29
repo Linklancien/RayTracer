@@ -17,6 +17,7 @@ mut:
 	viewport_upper_left Point
 	samples_per_pixel int = 10
 	rd Rand
+	max_depth int
 }
 
 fn (mut c Camera) initialize() {
@@ -54,7 +55,7 @@ fn (mut c Camera) render(world Hittable) {
 			color = [f64(0), 0, 0]
 			for _ in 0..c.samples_per_pixel {
 				ray := c.get_ray(i, j)
-				sample_color := c.ray_color(ray, world)
+				sample_color := c.ray_color(ray, c.max_depth, world)
 				color[0] += sample_color.x
 				color[1] += sample_color.y
 				color[2] += sample_color.z
@@ -89,11 +90,17 @@ fn (mut c Camera) pixel_sample_square() Vector { // maybe replace later by a smo
 }
 
 [inline]
-fn (mut c Camera) ray_color(r Ray, world Hittable) Vector {
+fn (mut c Camera) ray_color(r Ray, depth int, world Hittable) Vector {
 	mut rec := HitRecord{}
+
+	// If we've exceeded the ray bounce limit, no more light is gathered.
+    if depth <= 0{
+        return Vector{0, 0, 0}
+	}
+
 	if world.hit(r, Interval{0, infinity}, mut rec) {
 		direction := c.random_on_hemisphere(rec.normal)
-		return c.ray_color(Ray{rec.p, direction}, world).multf(0.5)
+		return c.ray_color(Ray{rec.p, direction}, depth-1, world).multf(0.5)
 	}
 	unit_direction := r.dir.normalize()
 	a := 0.5 * (unit_direction.y + 1.0)
