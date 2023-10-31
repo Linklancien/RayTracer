@@ -52,3 +52,11 @@ fn f64_bits(f f64) u64 {
 fn f64_from_bits(b u64) f64 {
 	return *unsafe { &f64(&b) }
 }
+
+fn fabs(a f64) f64 {
+	if a >= 0 {
+		return a
+	} else {
+		return -a
+	}
+}

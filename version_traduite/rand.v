@@ -8,13 +8,13 @@ struct Rand {
 	mut: seed u64
 }
 
-fn (mut rd Rand) rd_u64() u64 {
+fn rd_u64() u64 {
 	return r.u64()
 }
 
 /*
 [inline]
-fn (mut rd Rand) rd_u64() u64{
+fn rd_u64() u64{
 	rd.seed += 1
 	b := rd.seed + u64(0xa0761d6478bd642f)
 	a := b ^ u64(0xe7037ed1a0b428db)
@@ -34,11 +34,40 @@ fn (mut rd Rand) rd_u64() u64{
 }*/
 
 [inline]
-fn (mut rd Rand) rd_f64() f64 {
-	return f64((rd.rd_u64() >> 12) * reciprocal_2_52nd)
+fn rd_f64() f64 {
+	return f64((rd_u64() >> 12) * reciprocal_2_52nd)
 }
 
 [inline]
-fn (mut rd Rand) rd_f64_between(min f64, max f64) f64 {
-	return min + (max-min)*rd.rd_f64()
+fn rd_f64_between(min f64, max f64) f64 {
+	return min + (max-min)*rd_f64()
+}
+
+fn random_vector() Vector {
+	return Vector{rd_f64(), rd_f64(), rd_f64()}
+}
+
+fn random_vector_between(min f64, max f64) Vector {
+	return Vector{rd_f64_between(min, max), rd_f64_between(min, max), rd_f64_between(min, max)}
+}
+
+fn random_vector_unit_sphere() Vector {
+	mut p := random_vector_between(-1, 1)
+	for p.lenght_squared() >= 1 {
+		p = random_vector_between(-1, 1)
+	}
+	return p
+}
+
+fn random_unit_vector() Vector {
+	return random_vector_unit_sphere().normalize()
+}
+
+fn random_on_hemisphere(normal Vector) Vector {
+	on_unit_sphere := random_unit_vector()
+	if dot(on_unit_sphere, normal) >= 0.0 {
+		return on_unit_sphere
+	}else {
+		return on_unit_sphere.invert()
+	}
 }

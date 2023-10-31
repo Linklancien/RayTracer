@@ -1,3 +1,7 @@
+const (
+	s = 1e-8
+)
+
 struct Vector {
 	x f64
 	y f64
@@ -32,6 +36,14 @@ fn (v1 Vector) + (v2 Vector) Vector {
 	return Vector{v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}
 }
 
+fn (v1 Vector) - (v2 Vector) Vector {
+	return Vector{v1.x - v2.x, v1.y - v2.y, v1.z - v2.z}
+}
+
+fn (v1 Vector) * (v2 Vector) Vector {
+	return Vector{v1.x * v2.x, v1.y * v2.y, v1.z * v2.z}
+}
+
 fn (vec Vector) invert() Vector {
 	return Vector{-vec.x, -vec.y, -vec.z}
 }
@@ -44,4 +56,12 @@ fn (v Vector) to_color() Vector {
 	color = (color|u8(v.y*255)) << 8
 	color = (color|u8(v.x*255))*/
 	return v
+}
+
+fn (v Vector) near_zero() bool {
+	return fabs(v.x) < s && fabs(v.y) < s && fabs(v.z) < s
+}
+
+fn reflect(v Vector, n Vector) Vector {
+	return v - n.multf(2*dot(v,n))
 }
