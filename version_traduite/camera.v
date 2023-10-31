@@ -1,4 +1,5 @@
 import stbi
+import math
 
 struct Camera {
 mut:
@@ -18,6 +19,7 @@ mut:
 	samples_per_pixel int = 10
 	rd Rand
 	max_depth int
+	vfov f64 = 90
 }
 
 fn (mut c Camera) initialize() {
@@ -27,7 +29,9 @@ fn (mut c Camera) initialize() {
 	}
 
 	c.focal_length = 1.0
-	c.viewport_height = 2.0
+	theta := degrees_to_radians(c.vfov)
+	h := math.tan(theta/2)
+	c.viewport_height = 2.0 * h * c.focal_length
 	c.viewport_width = c.viewport_height * (f64(c.image_width) / f64(c.image_height))
 	c.center = Point{0, 0, 0}
 
