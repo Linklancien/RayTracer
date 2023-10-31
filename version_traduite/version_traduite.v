@@ -11,8 +11,8 @@ fn main() {
 	start_time := time.now()
 	material_ground := Lambertian{Vector{0.8, 0.8, 0.0}}
 	material_center := Lambertian{Vector{0.7, 0.3, 0.3}}
-	material_left := Metal{Vector{0.8, 0.8, 0.8}}
-	material_right := Metal{Vector{0.8, 0.6, 0.2}}
+	material_left := Metal{Vector{0.8, 0.8, 0.8}, 0.3}
+	material_right := Metal{Vector{0.8, 0.6, 0.2}, 1.0}
 	println('Started at ${start_time}')
 	mut world := HittableList{}
 	world.objects << Sphere{Point{0, 0, -1}, 0.5, material_center}
