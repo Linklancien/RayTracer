@@ -65,3 +65,10 @@ fn (v Vector) near_zero() bool {
 fn reflect(v Vector, n Vector) Vector {
 	return v - n.multf(2*dot(v,n))
 }
+
+fn refract(uv Vector, n Vector, etai_over_etat f64) Vector {
+	cos_theta := dot(uv.invert(), n)
+	r_out_perp := (uv + n.multf(cos_theta)).multf(etai_over_etat)
+	r_out_parallel := n.multf(-sqrt(fabs(1.0 - r_out_perp.lenght_squared())))
+	return r_out_parallel + r_out_perp
+}
