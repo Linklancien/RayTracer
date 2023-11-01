@@ -10,7 +10,6 @@ mut:
 	pixel00_loc Point
 	pixel_delta_u Vector
 	pixel_delta_v Vector
-	focal_length f64
 	viewport_height f64
 	viewport_width f64
 	viewport_u Vector
@@ -19,7 +18,19 @@ mut:
 	samples_per_pixel int = 10
 	rd Rand
 	max_depth int
+	
 	vfov f64 = 90
+	lookfrom Point = Point{0, 0, -1}
+	lookat Point = Point{0, 0, 0}
+	vup Vector = Vector{0, 1, 0}
+	u Vector
+	v Vector
+	w Vector
+
+	defocus_angle f64
+	focus_dist f64 = 10
+	defocus_disk_u Vector
+	defocus_disk_v Vector
 }
 
 fn (mut c Camera) initialize() {
@@ -28,22 +39,29 @@ fn (mut c Camera) initialize() {
 		c.image_height = 1
 	}
 
-	c.focal_length = 1.0
+	c.center = c.lookfrom
+
 	theta := degrees_to_radians(c.vfov)
 	h := math.tan(theta/2)
-	c.viewport_height = 2.0 * h * c.focal_length
+	c.viewport_height = 2.0 * h * c.focus_dist
 	c.viewport_width = c.viewport_height * (f64(c.image_width) / f64(c.image_height))
-	c.center = Point{0, 0, 0}
 
-	c.viewport_u = Vector{c.viewport_width, 0, 0}
-	c.viewport_v = Vector{0, -c.viewport_height, 0}
+	c.w = (c.lookfrom - c.lookat).normalize()
+	c.u = (cross(c.vup, c.w)).normalize()
+	c.v = cross(c.w, c.u)
+
+	c.viewport_u = c.u.multf(c.viewport_width)
+	c.viewport_v = c.v.multf(-c.viewport_height)
 
 	c.pixel_delta_u = c.viewport_u.divf(f64(c.image_width))
 	c.pixel_delta_v = c.viewport_v.divf(f64(c.image_height))
 
-	c.viewport_upper_left = c.center.subv(Vector{0, 0, c.focal_length}).subv(c.viewport_u.divf(2)).subv(c.viewport_v.divf(2))
+	c.viewport_upper_left = c.center.subv(c.w.multf(c.focus_dist)).subv(c.viewport_u.divf(2)).subv(c.viewport_v.divf(2))
 	c.pixel00_loc = c.viewport_upper_left.addv(c.pixel_delta_u.divf(2)).addv(c.pixel_delta_v.divf(2))
 
+	defocus_radius := c.focus_dist * math.tan(degrees_to_radians(c.defocus_angle/2.0))
+	c.defocus_disk_u = c.u.multf(defocus_radius)
+	c.defocus_disk_v = c.v.multf(defocus_radius)
 }
 
 [direct_array_access]
@@ -89,9 +107,14 @@ fn linear_to_gamma(linear_component f64)f64{
 fn (mut c Camera) get_ray(i int, j int) Ray {
 	pixel_center := c.pixel00_loc.addv(c.pixel_delta_u.multf(i)).addv(c.pixel_delta_v.multf(j))
 	pixel_sample := pixel_center.addv(c.pixel_sample_square())
-	ray_origin := c.center
+	ray_origin := if c.defocus_angle <= 0 {c.center} else {c.defocus_disk_sample()}
 	ray_direction := pixel_sample.subp(c.center)
 	return Ray{ray_origin, ray_direction}
+}
+
+fn (c Camera) defocus_disk_sample() Point {
+	p := random_in_unit_disk()
+	return c.center.addv(c.defocus_disk_u.multf(p.x)).addv(c.defocus_disk_v.multf(p.y))
 }
 
 [inline]

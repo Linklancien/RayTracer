@@ -51,10 +51,20 @@ fn random_vector_between(min f64, max f64) Vector {
 	return Vector{rd_f64_between(min, max), rd_f64_between(min, max), rd_f64_between(min, max)}
 }
 
+[inline]
 fn random_vector_unit_sphere() Vector {
 	mut p := random_vector_between(-1, 1)
-	for p.lenght_squared() >= 1 {
+	for p.length_squared() >= 1 {
 		p = random_vector_between(-1, 1)
+	}
+	return p
+}
+
+[inline]
+fn random_in_unit_disk() Vector {
+	mut p := Vector{rd_f64_between(-1, 1), rd_f64_between(-1, 1), 0}
+	for p.length_squared() >= 1 {
+		p = Vector{rd_f64_between(-1, 1), rd_f64_between(-1, 1), 0}
 	}
 	return p
 }

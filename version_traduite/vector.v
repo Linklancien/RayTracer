@@ -16,20 +16,28 @@ fn (vec Vector) multf(t f64) Vector {
 	return Vector{vec.x * t, vec.y * t, vec.z * t}
 }
 
-fn (vec Vector) lenght_squared() f64 {
+fn (vec Vector) length_squared() f64 {
 	return dot(vec, vec)
 }
 
-fn (vec Vector) lenght() f64 {
-	return sqrt(vec.lenght_squared())
+fn (vec Vector) length() f64 {
+	return sqrt(vec.length_squared())
 }
 
 fn (vec Vector) normalize() Vector {
-	return vec.divf(vec.lenght())
+	return vec.divf(vec.length())
 }
 
 fn dot(v1 Vector, v2 Vector) f64 { // produit scalaire (dot product)
 	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
+}
+
+fn cross(u Vector, v Vector) Vector {
+	return Vector{
+		u.y * v.z - u.z * v.y,
+		u.z * v.x - u.x * v.z,
+		u.x * v.y - u.y * v.x
+	}
 }
 
 fn (v1 Vector) + (v2 Vector) Vector {
@@ -69,6 +77,6 @@ fn reflect(v Vector, n Vector) Vector {
 fn refract(uv Vector, n Vector, etai_over_etat f64) Vector {
 	cos_theta := dot(uv.invert(), n)
 	r_out_perp := (uv + n.multf(cos_theta)).multf(etai_over_etat)
-	r_out_parallel := n.multf(-sqrt(fabs(1.0 - r_out_perp.lenght_squared())))
+	r_out_parallel := n.multf(-sqrt(fabs(1.0 - r_out_perp.length_squared())))
 	return r_out_parallel + r_out_perp
 }

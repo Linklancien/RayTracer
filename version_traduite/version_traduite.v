@@ -17,10 +17,10 @@ fn main() {
 	material_right := Metal{Vector{0.8, 0.6, 0.2}, 0.1}
 	println('Started at ${start_time}')
 	mut world := HittableList{}
-	world.objects << Sphere{Point{0, 0.01, -1}, 0.5, material_center}
-	world.objects << Sphere{Point{0, 0.01, -1}, -0.4, material_center}
-	world.objects << Sphere{Point{-1.1, 0, -1}, 0.5, material_left}
-	world.objects << Sphere{Point{1.1, 0, -1}, 0.5, material_right}
+	world.objects << Sphere{Point{0, 0, -1}, 0.5, material_center}
+	world.objects << Sphere{Point{0, 0, -1}, -0.4, material_center}
+	world.objects << Sphere{Point{-1, 0, -1}, 0.5, material_left}
+	world.objects << Sphere{Point{1, 0, -1}, 0.5, material_right}
 	world.objects << Sphere{Point{0, -100.5, -1}, 100, material_ground}
 
 	mut cam := Camera{}
@@ -29,8 +29,15 @@ fn main() {
 	cam.image_width = 400
 	cam.samples_per_pixel = 100
 	cam.max_depth         = 50
-	cam.vfov = 90
+	cam.vfov = 20
+	cam.lookfrom = Point{-2, 2, 1}
+	cam.lookat = Point{0, 0, -1}
+	cam.vup = Vector{0, 1, 0}
 
+	cam.defocus_angle = 0.0
+	// cam.focus_dist = 3.4
+	cam.focus_dist = (cam.lookfrom - cam.lookat).length()
+	
 	cam.render(world)
 	finish_time := time.now()
 	println('Finished at ${finish_time}, took ${finish_time-start_time}')
