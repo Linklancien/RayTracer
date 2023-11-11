@@ -33,11 +33,7 @@ fn dot(v1 Vector, v2 Vector) f64 { // produit scalaire (dot product)
 }
 
 fn cross(u Vector, v Vector) Vector {
-	return Vector{
-		u.y * v.z - u.z * v.y,
-		u.z * v.x - u.x * v.z,
-		u.x * v.y - u.y * v.x
-	}
+	return Vector{u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x}
 }
 
 fn (v1 Vector) + (v2 Vector) Vector {
@@ -71,7 +67,7 @@ fn (v Vector) near_zero() bool {
 }
 
 fn reflect(v Vector, n Vector) Vector {
-	return v - n.multf(2*dot(v,n))
+	return v - n.multf(2 * dot(v, n))
 }
 
 fn refract(uv Vector, n Vector, etai_over_etat f64) Vector {

@@ -1,12 +1,12 @@
 const (
-	x1p64 = f64_from_bits(u64(0x43f0000000000000))
-	x1p1023 = f64_from_bits(u64(0x7fe0000000000000))
-	x1p53 = f64_from_bits(u64(0x4340000000000000))
+	x1p64    = f64_from_bits(u64(0x43f0000000000000))
+	x1p1023  = f64_from_bits(u64(0x7fe0000000000000))
+	x1p53    = f64_from_bits(u64(0x4340000000000000))
 	x1p_1022 = f64_from_bits(u64(0x0010000000000000))
 )
 
 [inline]
-fn degrees_to_radians(degrees f64) f64{
+fn degrees_to_radians(degrees f64) f64 {
 	return degrees * pi / 180.0
 }
 
@@ -15,6 +15,7 @@ fn sqrt(a f64) f64 { // /!\ approximations and maybe doesn't work for some numbe
 	mut x := a
 	z, ex := frexp(x)
 	w := x
+
 	// approximate square root of number between 0.5 and 1
 	// relative error of approximation = 7.47e-3
 	x = 4.173075996388649989089e-1 + 5.9016206709064458299663e-1 * z // adjust for odd powers of 2
@@ -22,6 +23,7 @@ fn sqrt(a f64) f64 { // /!\ approximations and maybe doesn't work for some numbe
 		x *= 1.41421356237309504880168872420969807856967187537694807317667974
 	}
 	x = scalbn(x, ex >> 1)
+
 	// newton iterations
 	x = 0.5 * (x + w / x)
 	x = 0.5 * (x + w / x)

@@ -5,9 +5,11 @@ const (
 )
 
 struct Rand {
-	mut: seed u64
+mut:
+	seed u64
 }
 
+[inline]
 fn rd_u64() u64 {
 	return r.u64()
 }
@@ -40,15 +42,18 @@ fn rd_f64() f64 {
 
 [inline]
 fn rd_f64_between(min f64, max f64) f64 {
-	return min + (max-min)*rd_f64()
+	return min + (max - min) * rd_f64()
 }
 
+[inline]
 fn random_vector() Vector {
 	return Vector{rd_f64(), rd_f64(), rd_f64()}
 }
 
+[inline]
 fn random_vector_between(min f64, max f64) Vector {
-	return Vector{rd_f64_between(min, max), rd_f64_between(min, max), rd_f64_between(min, max)}
+	return Vector{rd_f64_between(min, max), rd_f64_between(min, max), rd_f64_between(min,
+		max)}
 }
 
 [inline]
@@ -69,15 +74,17 @@ fn random_in_unit_disk() Vector {
 	return p
 }
 
+[inline]
 fn random_unit_vector() Vector {
 	return random_vector_unit_sphere().normalize()
 }
 
+[inline]
 fn random_on_hemisphere(normal Vector) Vector {
 	on_unit_sphere := random_unit_vector()
 	if dot(on_unit_sphere, normal) >= 0.0 {
 		return on_unit_sphere
-	}else {
+	} else {
 		return on_unit_sphere.invert()
 	}
 }

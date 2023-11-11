@@ -27,7 +27,7 @@ fn (list HittableList) hit(r Ray, ray_t Interval, mut rec HitRecord) bool {
 struct Sphere {
 	center Point
 	radius f64
-	mat Material
+	mat    Material
 }
 
 fn (s Sphere) hit(r Ray, ray_t Interval, mut rec HitRecord) bool {
