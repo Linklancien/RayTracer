@@ -13,7 +13,7 @@ fn (l Lambertian) scatter(r_in Ray, rec HitRecord, mut attenuation Vector, mut s
 	if scatter_direction.near_zero() {
 		scatter_direction = rec.normal
 	}
-	scattered = Ray{rec.p, scatter_direction}
+	scattered = Ray{rec.p, scatter_direction, r_in.tm}
 	attenuation = l.albedo
 	return true
 }
@@ -28,9 +28,9 @@ fn (m Metal) scatter(r_in Ray, rec HitRecord, mut attenuation Vector, mut scatte
 	fuzz := random_unit_vector().multf(m.fuzz)
 	dir := reflected + fuzz
 	if dot(dir, rec.normal) > 0 {
-		scattered = Ray{rec.p, dir}
+		scattered = Ray{rec.p, dir, r_in.tm}
 	} else {
-		scattered = Ray{rec.p, reflected + fuzz.invert()}
+		scattered = Ray{rec.p, reflected + fuzz.invert(), r_in.tm}
 	}
 
 	// scattered = Ray{rec.p, dir}
@@ -59,7 +59,7 @@ fn (d Dielectric) scatter(r_in Ray, rec HitRecord, mut attenuation Vector, mut s
 		dir = refract(unit_direction, rec.normal, refraction_ratio)
 	}
 
-	scattered = Ray{rec.p, dir}
+	scattered = Ray{rec.p, dir, r_in.tm}
 	return true
 }
 

@@ -118,7 +118,7 @@ fn (mut c Camera) get_ray(i int, j int, nb int) Ray {
 	pixel_sample := pixel_center.addv(c.pixel_sample_square_grid(nb)) //(c.pixel_sample_square_grid(nb))
 	ray_origin := if c.defocus_angle <= 0 { c.center } else { c.defocus_disk_sample() }
 	ray_direction := pixel_sample - ray_origin
-	return Ray{ray_origin, ray_direction}
+	return Ray{ray_origin, ray_direction, rd_f64()}
 }
 
 fn (c Camera) defocus_disk_sample() Point {

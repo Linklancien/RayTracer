@@ -62,3 +62,19 @@ fn fabs(a f64) f64 {
 		return -a
 	}
 }
+
+fn min(a f64, b f64) f64 {
+	if a < b {
+		return a
+	}else{
+		return b
+	}
+}
+
+fn max(a f64, b f64) f64 {
+	if a > b {
+		return a
+	}else{
+		return b
+	}
+}
