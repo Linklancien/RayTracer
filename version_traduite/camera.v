@@ -73,7 +73,7 @@ fn (mut c Camera) initialize() {
 	c.defocus_disk_v = c.v.multf(defocus_radius)
 }
 
-[direct_array_access]
+@[direct_array_access]
 fn (mut c Camera) render(world Hittable) {
 	c.initialize()
 
@@ -112,7 +112,7 @@ fn linear_to_gamma(linear_component f64) f64 {
 	return sqrt(linear_component)
 }
 
-[inline]
+@[inline]
 fn (mut c Camera) get_ray(i int, j int, nb int) Ray {
 	pixel_center := c.pixel00_loc.addv(c.pixel_delta_u.multf(i)).addv(c.pixel_delta_v.multf(j))
 	pixel_sample := pixel_center.addv(c.pixel_sample_square_grid(nb)) //(c.pixel_sample_square_grid(nb))
@@ -126,7 +126,7 @@ fn (c Camera) defocus_disk_sample() Point {
 	return c.center.addv(c.defocus_disk_u.multf(p.x)).addv(c.defocus_disk_v.multf(p.y))
 }
 
-[inline]
+@[inline]
 fn (mut c Camera) pixel_sample_square_grid(nb int) Vector { // maybe replace later by a circle ?
 	i := nb / c.side_sample_per_pixel
 	j := nb % c.side_sample_per_pixel
@@ -135,14 +135,14 @@ fn (mut c Camera) pixel_sample_square_grid(nb int) Vector { // maybe replace lat
 	return c.pixel_delta_u.multf(px) + c.pixel_delta_v.multf(py)
 }
 
-[inline]
+@[inline]
 fn (mut c Camera) pixel_sample_square() Vector { // maybe replace later by a smooth distribution? in a circle ?
 	px := -0.5 + rd_f64()
 	py := -0.5 + rd_f64()
 	return c.pixel_delta_u.multf(px) + c.pixel_delta_v.multf(py)
 }
 
-[inline]
+@[inline]
 fn ray_color(r Ray, depth int, world Hittable) Vector {
 	mut rec := HitRecord{}
 

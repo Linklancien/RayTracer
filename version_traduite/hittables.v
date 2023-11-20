@@ -1,18 +1,19 @@
-import rand as r
+import rand
 
 interface Hittable {
 	// const ray& r, double ray_tmin, double ray_tmax, HitRecord& rec
+	bbox Aabb
 	hit(r Ray, ray_t Interval, mut rec HitRecord) bool
 }
 
 struct HittableList {
 mut:
 	objects []Hittable
-	bbox Aabb
+	bbox    Aabb
 }
 
 fn (mut list HittableList) add(obj Hittable) {
-	list << obj
+	list.objects << obj
 	list.bbox = aabb_aabb(list.bbox, obj.bbox)
 }
 
@@ -33,50 +34,79 @@ fn (list HittableList) hit(r Ray, ray_t Interval, mut rec HitRecord) bool {
 }
 
 struct BvhNode {
-	left Hittable
+mut:
+	left  Hittable
 	right Hittable
-	bbox Aabb
+	bbox  Aabb
 }
 
-fn new_bvh_node(src_objects []Hittable, start int, end int) BvhNode {
-	bvh := BvhNode{}
-	axis := r.int_in_range(0, 3)
-	comparator := if axis == 0 { box_x_compare } else {if axis == 1 { box_y_compare } else { box_z_compare }}
-	object_span := end - start
+fn new_bvh_node(src_objects []Hittable) BvhNode {
+	mut bvh := BvhNode{}
+	axis := rand.int_in_range(0, 3) or { panic(err) }
+	comparator := if axis == 0 {
+		box_x_compare
+	} else {
+		if axis == 1 { box_y_compare } else { box_z_compare }
+	}
+	object_span := src_objects.len
 	if object_span == 1 {
-		bvh.left = src_objects[start]
-		bvh.right = src_objects[start]
+		bvh.left = src_objects[0]
+		bvh.right = src_objects[0]
 	} else if object_span == 2 {
-		if comparator(src_objects[start], src_objects[start+1]) {
-			bvh.left = src_objects[start]
-			bvh.right = src_objects[start+1]
+		if comparator(src_objects[0], src_objects[1]) == -1 {
+			bvh.left = src_objects[0]
+			bvh.right = src_objects[1]
 		} else {
-			bvh.left = src_objects[start+1]
-			bvh.right = src_objects[start]
+			bvh.left = src_objects[1]
+			bvh.right = src_objects[0]
 		}
 	} else {
-		sort la liste 
-		mid = end/2
-		bvh.left = new_bvh_node(nouvelle_liste[0, mid])
-		bvh.right = new_bvh_node(nouvelle_liste[mid, end])
+		mut obj := src_objects.clone()
+		obj.sort_with_compare(comparator)
+		mid := object_span / 2
+		bvh.left = new_bvh_node(obj[..mid])
+		bvh.right = new_bvh_node(obj[mid..])
 	}
+	bvh.bbox = aabb_aabb(bvh.left.bbox, bvh.right.bbox)
 	return bvh
 }
 
+fn box_compare(a &Hittable, b &Hittable, axis_index int) int {
+	if a.bbox.axis(axis_index).min <= b.bbox.axis(axis_index).min {
+		return -1
+	}
+	return 1
+}
+
+fn box_x_compare(a &Hittable, b &Hittable) int {
+	return box_compare(a, b, 0)
+}
+
+fn box_y_compare(a &Hittable, b &Hittable) int {
+	return box_compare(a, b, 1)
+}
+
+fn box_z_compare(a &Hittable, b &Hittable) int {
+	return box_compare(a, b, 2)
+}
+
 fn (bvh BvhNode) hit(r Ray, ray_t Interval, mut rec HitRecord) bool {
-	if !bbox.hit(r, ray_t) { return false }
+	if !bvh.bbox.hit(r, ray_t) {
+		return false
+	}
 	hit_left := bvh.left.hit(r, ray_t, mut rec)
-	hit_right := bvh.right.hit(r, Interval{ray_t.min, if hit_left { rec.t } else {ray_t.max}}, mut rec)
+	hit_right := bvh.right.hit(r, Interval{ray_t.min, if hit_left { rec.t } else { ray_t.max }}, mut
+		rec)
 	return hit_left || hit_right
 }
 
 struct Sphere {
-	center 		Point
-	radius 		f64
-	mat    		Material
-	bbox   		Aabb
-	is_moving 	bool
-	center_vec 	Vector
+	center     Point
+	radius     f64
+	mat        Material
+	bbox       Aabb
+	is_moving  bool
+	center_vec Vector
 }
 
 fn new_sphere(center Point, radius f64, mat Material) Sphere {
@@ -96,7 +126,7 @@ fn (s Sphere) center(time f64) Point {
 }
 
 fn (s Sphere) hit(r Ray, ray_t Interval, mut rec HitRecord) bool {
-	center := if s.is_moving {s.center(r.tm)} else {s.center}
+	center := if s.is_moving { s.center(r.tm) } else { s.center }
 	oc := r.origin - center
 	a := dot(r.dir, r.dir)
 	half_b := dot(oc, r.dir)

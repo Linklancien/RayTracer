@@ -5,12 +5,12 @@ const (
 	x1p_1022 = f64_from_bits(u64(0x0010000000000000))
 )
 
-[inline]
+@[inline]
 fn degrees_to_radians(degrees f64) f64 {
 	return degrees * pi / 180.0
 }
 
-[inline]
+@[inline]
 fn sqrt(a f64) f64 { // /!\ approximations and maybe doesn't work for some numbers
 	mut x := a
 	z, ex := frexp(x)
@@ -31,7 +31,7 @@ fn sqrt(a f64) f64 { // /!\ approximations and maybe doesn't work for some numbe
 	return x
 }
 
-[inline]
+@[inline]
 fn frexp(x f64) (f64, int) {
 	mut y := f64_bits(x)
 	e_ := int((y >> 52) & 0x7ff) - 0x3fe
@@ -40,17 +40,17 @@ fn frexp(x f64) (f64, int) {
 	return f64_from_bits(y), e_
 }
 
-[inline]
+@[inline]
 fn scalbn(x f64, n_ int) f64 {
 	return x * f64_from_bits(u64((0x3ff + n_)) << 52)
 }
 
-[inline]
+@[inline]
 fn f64_bits(f f64) u64 {
 	return *unsafe { &u64(&f) }
 }
 
-[inline]
+@[inline]
 fn f64_from_bits(b u64) f64 {
 	return *unsafe { &f64(&b) }
 }
@@ -66,7 +66,7 @@ fn fabs(a f64) f64 {
 fn min(a f64, b f64) f64 {
 	if a < b {
 		return a
-	}else{
+	} else {
 		return b
 	}
 }
@@ -74,7 +74,7 @@ fn min(a f64, b f64) f64 {
 fn max(a f64, b f64) f64 {
 	if a > b {
 		return a
-	}else{
+	} else {
 		return b
 	}
 }

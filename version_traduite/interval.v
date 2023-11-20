@@ -21,6 +21,6 @@ fn (i Interval) size() f64 {
 }
 
 fn (i Interval) expand(delta f64) Interval {
-	padding := delta/2
+	padding := delta / 2
 	return Interval{i.min - padding, i.max + padding}
 }
