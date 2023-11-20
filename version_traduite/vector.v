@@ -8,6 +8,16 @@ struct Vector {
 	z f64
 }
 
+fn (v Vector) axis(n int) f64 {
+	if n == 0 {
+		return v.x
+	}else if n == 1 {
+		return v.y
+	}else {
+		return v.z
+	}
+}
+
 fn (vec Vector) divf(t f64) Vector {
 	return Vector{vec.x / t, vec.y / t, vec.z / t}
 }

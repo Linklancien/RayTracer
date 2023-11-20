@@ -5,7 +5,7 @@ interface Material {
 }
 
 struct Lambertian {
-	albedo Vector
+	albedo Texture
 }
 
 fn (l Lambertian) scatter(r_in Ray, rec HitRecord, mut attenuation Vector, mut scattered Ray) bool {
@@ -14,12 +14,12 @@ fn (l Lambertian) scatter(r_in Ray, rec HitRecord, mut attenuation Vector, mut s
 		scatter_direction = rec.normal
 	}
 	scattered = Ray{rec.p, scatter_direction, r_in.tm}
-	attenuation = l.albedo
+	attenuation = l.albedo.value(0, 0, rec.p)
 	return true
 }
 
 struct Metal {
-	albedo Vector
+	albedo Texture
 	fuzz   f64
 }
 
@@ -34,7 +34,7 @@ fn (m Metal) scatter(r_in Ray, rec HitRecord, mut attenuation Vector, mut scatte
 	}
 
 	// scattered = Ray{rec.p, dir}
-	attenuation = m.albedo
+	attenuation = m.albedo.value(0, 0, rec.p)
 	return dot(scattered.dir, rec.normal) > 0
 }
 

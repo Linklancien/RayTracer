@@ -40,7 +40,7 @@ mut:
 	bbox  Aabb
 }
 
-fn new_bvh_node(src_objects []Hittable) BvhNode {
+fn BvhNode.new(src_objects []Hittable) BvhNode {
 	mut bvh := BvhNode{}
 	axis := rand.int_in_range(0, 3) or { panic(err) }
 	comparator := if axis == 0 {
@@ -53,7 +53,7 @@ fn new_bvh_node(src_objects []Hittable) BvhNode {
 		bvh.left = src_objects[0]
 		bvh.right = src_objects[0]
 	} else if object_span == 2 {
-		if comparator(src_objects[0], src_objects[1]) == -1 {
+		if comparator(&src_objects[0], &src_objects[1]) == -1 {
 			bvh.left = src_objects[0]
 			bvh.right = src_objects[1]
 		} else {
@@ -64,8 +64,8 @@ fn new_bvh_node(src_objects []Hittable) BvhNode {
 		mut obj := src_objects.clone()
 		obj.sort_with_compare(comparator)
 		mid := object_span / 2
-		bvh.left = new_bvh_node(obj[..mid])
-		bvh.right = new_bvh_node(obj[mid..])
+		bvh.left = BvhNode.new(obj[..mid])
+		bvh.right = BvhNode.new(obj[mid..])
 	}
 	bvh.bbox = aabb_aabb(bvh.left.bbox, bvh.right.bbox)
 	return bvh

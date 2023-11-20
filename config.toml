@@ -1,7 +1,7 @@
 aspect_ratio = 1.77777778
-image_width = 400
-side_sample_per_pixel = 7
+image_width = 1000
+side_sample_per_pixel = 10
 max_depth         = 10
 vfov = 20
-defocus_angle = 0.6
+defocus_angle = 0.3
 focus_dist = 10.0

@@ -4,6 +4,16 @@ struct Point {
 	z f64
 }
 
+fn (p Point) axis(n int) f64 {
+	if n == 0 {
+		return p.x
+	}else if n == 1 {
+		return p.y
+	}else {
+		return p.z
+	}
+}
+
 fn (p1 Point) - (p2 Point) Vector {
 	return Vector{p1.x - p2.x, p1.y - p2.y, p1.z - p2.z}
 }
