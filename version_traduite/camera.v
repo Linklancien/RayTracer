@@ -78,7 +78,7 @@ fn (mut c Camera) render(world Hittable) {
 	c.initialize()
 
 	mut image := []u8{cap: c.image_height * 4 * c.image_width}
-	print('${c.image_height} lines remaining ')
+	print('\n${c.image_height} lines remaining ')
 	color_scale := 1.0 / f64(c.samples_per_pixel)
 	mut color := [f64(0), 0, 0]
 	for j := 0; j < c.image_height; j++ {
@@ -100,7 +100,7 @@ fn (mut c Camera) render(world Hittable) {
 			color[2] = linear_to_gamma(color[2])
 			image << [u8(color[0] * 255), u8(color[1] * 255), u8(color[2] * 255), 255]
 		}
-		print('\r${c.image_height - j} ')
+		eprint('\r${c.image_height - j} ')
 	}
 	stbi.stbi_write_jpg('render.png', c.image_width, c.image_height, 4, &(image[0]), c.image_width * 4) or {
 		panic(err)

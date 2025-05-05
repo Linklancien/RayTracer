@@ -1,6 +1,4 @@
-const (
-	s = 1e-8
-)
+const s = 1e-8
 
 struct Vector {
 	x f64
@@ -11,9 +9,9 @@ struct Vector {
 fn (v Vector) axis(n int) f64 {
 	if n == 0 {
 		return v.x
-	}else if n == 1 {
+	} else if n == 1 {
 		return v.y
-	}else {
+	} else {
 		return v.z
 	}
 }

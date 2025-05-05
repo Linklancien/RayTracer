@@ -7,9 +7,9 @@ struct Point {
 fn (p Point) axis(n int) f64 {
 	if n == 0 {
 		return p.x
-	}else if n == 1 {
+	} else if n == 1 {
 		return p.y
-	}else {
+	} else {
 		return p.z
 	}
 }

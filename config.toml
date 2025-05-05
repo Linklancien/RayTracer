@@ -1,5 +1,5 @@
 aspect_ratio = 1.77777778
-image_width = 1000
+image_width = 100
 side_sample_per_pixel = 10
 max_depth         = 10
 vfov = 20

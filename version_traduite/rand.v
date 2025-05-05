@@ -1,8 +1,6 @@
 import rand as r
 
-const (
-	reciprocal_2_52nd = 1.0 / f64(u64(1) << 52)
-)
+const reciprocal_2_52nd = 1.0 / f64(u64(1) << 52)
 
 struct Rand {
 mut:

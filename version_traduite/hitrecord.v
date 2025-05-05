@@ -5,8 +5,8 @@ mut:
 	mat        Material
 	t          f64
 	front_face bool
-	u f64
-	v f64
+	u          f64
+	v          f64
 }
 
 fn (mut rec HitRecord) set_face_normal(r Ray, outward_normal Vector) {

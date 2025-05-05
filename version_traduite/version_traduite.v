@@ -3,10 +3,8 @@ import math as m
 import os
 import toml
 
-const (
-	infinity = 10e100
-	pi       = m.pi
-)
+const infinity = 10e100
+const pi = m.pi
 
 fn main() {
 	start_time := time.now()
@@ -21,7 +19,8 @@ fn main() {
 	world.objects << Sphere{Point{-1, 0, -2}, 0.5, Metal{Vector{116 / 255.0, 199 / 255.0, 236 / 255.0}, 0.1}}
 	world.objects << Sphere{Point{0, -100.5, -1}, 100, Lambertian{Vector{0.960784314, 0.760784314, 0.905882353}}}
 	*/
-	world.objects << new_sphere(Point{0, -1000, 0}, 1000, Lambertian{CheckerTexture.new(0.32, SolidColor{Vector{0.5, 0.5, 0.5}}, SolidColor{Vector{0, 0, 0}})})
+	world.objects << new_sphere(Point{0, -1000, 0}, 1000, Lambertian{CheckerTexture.new(0.32,
+		SolidColor{Vector{0.5, 0.5, 0.5}}, SolidColor{Vector{0, 0, 0}})})
 	for a := -11; a < 11; a++ {
 		for b := -11; b < 11; b++ {
 			choose_mat := rd_f64()
@@ -69,7 +68,8 @@ fn main() {
 	cam.vup = Vector{0, 1, 0}
 	cam.defocus_angle = config.value('defocus_angle').f64()
 	cam.focus_dist = config.value('focus_dist').f64()
-
+	
+	print('starting render')
 	cam.render(world)
 
 	finish_time := time.now()

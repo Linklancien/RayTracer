@@ -25,7 +25,7 @@ fn (a Aabb) axis(n int) Interval {
 
 fn (aabb Aabb) hit(r Ray, ray Interval) bool {
 	mut ray_t := ray
-	for a := 0; a < 3; a+=1 {
+	for a := 0; a < 3; a += 1 {
 		inv_d := 1 / r.dir.axis(a)
 		orig := r.origin.axis(a)
 
@@ -34,10 +34,16 @@ fn (aabb Aabb) hit(r Ray, ray Interval) bool {
 		if inv_d < 0 {
 			t0, t1 = t1, t0
 		}
-		if t0 > ray_t.min {ray_t.min = t0}
-		if t1 < ray_t.max {ray_t.max = t1}
+		if t0 > ray_t.min {
+			ray_t.min = t0
+		}
+		if t1 < ray_t.max {
+			ray_t.max = t1
+		}
 
-		if ray_t.max <= ray_t.min {return false}
+		if ray_t.max <= ray_t.min {
+			return false
+		}
 	}
 	return true
 }
