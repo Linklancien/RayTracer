@@ -102,7 +102,7 @@ fn (mut c Camera) render(world Hittable) {
 		}
 		eprint('\r${c.image_height - j} ')
 	}
-	stbi.stbi_write_jpg('render.png', c.image_width, c.image_height, 4, &(image[0]), c.image_width * 4) or {
+	stbi.stbi_write_jpg('renders/render.png', c.image_width, c.image_height, 4, &(image[0]), c.image_width * 4) or {
 		panic(err)
 	}
 	println('\rDone                ')

@@ -74,6 +74,5 @@ fn main() {
 
 	finish_time := time.now()
 	println('Finished at ${finish_time}, took ${finish_time - start_time}')
-
-	os.execute('start " " "render.png"')
+	println('The render is in renders/render.png')
 }
