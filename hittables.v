@@ -35,8 +35,8 @@ fn (list HittableList) hit(r Ray, ray_t Interval, mut rec HitRecord) bool {
 
 struct BvhNode {
 mut:
-	left  Hittable
-	right Hittable
+	left  Hittable = Sphere{}
+	right Hittable = Sphere{}
 	bbox  Aabb
 }
 
@@ -103,7 +103,7 @@ fn (bvh BvhNode) hit(r Ray, ray_t Interval, mut rec HitRecord) bool {
 struct Sphere {
 	center     Point
 	radius     f64
-	mat        Material
+	mat        Material = Dielectric{}
 	bbox       Aabb
 	is_moving  bool
 	center_vec Vector
