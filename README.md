@@ -1,6 +1,6 @@
 # RayTracer
 
-A raytracer written in V following https://raytracing.github.io/books/RayTracingInOneWeekend.html (and the following books)
+A raytracer written in V following [_Ray Tracing in One Weekend_](https://raytracing.github.io/books/RayTracingInOneWeekend.html) (and the following books)
 
 ## Running the project
 Prerequisites: install V (https://github.com/vlang/v) (https://docs.vlang.io)
